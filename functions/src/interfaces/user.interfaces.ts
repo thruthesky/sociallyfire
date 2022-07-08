@@ -1,27 +1,51 @@
+import * as admin from "firebase-admin";
+
 export interface UserDocument {
-  // `uid` exists here for the compatibility of FlutterFlow
-  // `email` exists here for the compatibility of FlutterFlow
-  email?: string;
+  // `uid` is the user uid.
+  // It is being used by FlutterFlow, also.
+  uid?: string;
 
-  // `display_name` is a kebab case for compatibility of FlutterFlow
-  display_name?: string;
+  // `email` is used by FlutterFlow,
+  // but we don't save it here since it is a private information.
 
-  // `photo_url` is a kebab case for compatibility of FlutterFlow
-  photo_url?: string;
+  // User name.
+  // Note, `display_name` (as kebab case) is used by FlutterFlow and is
+  // ignored. Use `displayName` instead.
+  displayName?: string;
 
-  // It should be named as `createdAt`, but named as `created_time` for the compatibility of FlutterFlow,
-  created_time?: any;
+  // User photo url.
+  // Note, `photo_url` (as kebab case) is used by FlutterFlow and is
+  // ignored. Use `photoUrl` instead.
+  photoUrl?: string;
 
-  // `phone_number` exists for the compatibility of FlutterFlow
-  phone_number?: string;
+  // User registration time.
+  // Note, `creation_time` (as kebab case) is used by FlutterFlow and is
+  // ignored. Use `registeredAt` instead.
+  registeredAt?: admin.firestore.FieldValue;
+
+  // `phone_number` is used by FlutterFlow, and ignored.
+  // Since it is private information, we don't save it here.
 
   firstName?: string;
   middleName?: string;
   lastName?: string;
 
+  //
   gender?: string;
 
-  updatedAt?: number;
+  //
   birthday?: number;
-  profileReady?: number;
+}
+
+/**
+ * For searching user who has completed their profile.
+ */
+export interface UserMetaDocument {
+  hasDisplayName: boolean;
+  hasPhotoUrl: boolean;
+  hasFirstName: boolean;
+  hasLastName: boolean;
+  hasGender: boolean;
+  hasBirthday: boolean;
+  updatedAt?: admin.firestore.FieldValue;
 }

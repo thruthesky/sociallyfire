@@ -1,9 +1,8 @@
 import * as admin from "firebase-admin";
-import { config } from "./firebase.config";
+import { firebaseConfig } from "../firebase.config";
 
 admin.initializeApp({
-  databaseURL: config.databaseURL,
-  storageBucket: config.storageBucket,
+  storageBucket: firebaseConfig.storageBucket,
 });
 
 admin.firestore().settings({ ignoreUndefinedProperties: true });

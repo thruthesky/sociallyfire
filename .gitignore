@@ -1,3 +1,6 @@
+firebase.admin-key.json
+firebase.config.ts
+
 # Logs
 logs
 *.log
