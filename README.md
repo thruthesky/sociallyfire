@@ -7,7 +7,7 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 
 # Test
 
-TDD is the ultimate goal of this project.
+Perfect TDD is the ultimate goal of this project. The code of `cloud functions` is under `functions` folder and the tests are under `functions/tests` folder. To test, enter `functions/tests` folder first.
 
 ## Testing the test system.
 
