@@ -5,5 +5,5 @@ export const onPostCreate = functions
   .region("asia-northeast3")
   .database.ref("/posts/{postId}")
   .onCreate((snapshot, context) => {
-    return Post.onCreate(context.params.uid, {});
+    return Post.onCreate(context.params.uid, {} as any);
   });

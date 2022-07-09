@@ -1,6 +1,5 @@
 import * as admin from "firebase-admin";
-import { firebaseConfig } from "../../firebase.config";
-var serviceAccount = require("../../firebase.admin-key.json");
+var serviceAccount = require("../firebase.admin-key.json");
 
 export class FirebaseAppInitializer {
   constructor() {
@@ -8,7 +7,6 @@ export class FirebaseAppInitializer {
     try {
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        storageBucket: firebaseConfig.storageBucket,
       });
 
       admin.firestore().settings({ ignoreUndefinedProperties: true });

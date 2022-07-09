@@ -5,5 +5,5 @@ export const onCategoryCreate = functions
   .region("asia-northeast3")
   .database.ref("/categories/{categoryId}")
   .onCreate((snapshot, context) => {
-    return Category.onCreate(context.params.uid, {});
+    return Category.onCreate(context.params.uid, {} as any);
   });

@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "socially-test-project"
-  }
+    "default": "sociallyfire",
+    "sociallyfire": "sociallyfire"
+  },
+  "targets": {}
 }

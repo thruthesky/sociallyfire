@@ -1,9 +1,6 @@
 import * as admin from "firebase-admin";
-import { firebaseConfig } from "../../firebase.config";
 
-admin.initializeApp({
-  storageBucket: firebaseConfig.storageBucket,
-});
+admin.initializeApp();
 
 admin.firestore().settings({ ignoreUndefinedProperties: true });
 
