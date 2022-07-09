@@ -1,5 +1,5 @@
 /**
- * This tests if the system test is working.
+ * User CRUD test.
  */
 import "mocha";
 import { expect } from "chai";

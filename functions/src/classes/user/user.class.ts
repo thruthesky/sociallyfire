@@ -2,9 +2,8 @@
  * @file user.class.ts
  */
 import * as admin from "firebase-admin";
-import {UserDocument} from "../../interfaces/user.interfaces";
-import {ERROR_USER_NOT_FOUND} from "../../defines";
-import {UserMeta} from "./user.meta.class";
+import { UserDocument } from "../../interfaces/user.interfaces";
+import { ERROR_USER_NOT_FOUND } from "../../defines";
 
 /**
  * User
@@ -34,8 +33,7 @@ export class User {
     const data = {
       registeredAt: admin.firestore.FieldValue.serverTimestamp(),
     } as UserDocument;
-    await User.update(uid, data);
-    return UserMeta.update(uid, data);
+    return User.update(uid, data);
   }
 
   /**
@@ -48,10 +46,20 @@ export class User {
    *
    */
   static async onUpdate(
-      params: { uid: string },
-      data: UserDocument
+    params: { uid: string },
+    data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
-    return UserMeta.update(params.uid, data);
+    const doc = {
+      ...data,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      hasBirthday: !!data.birthday,
+      hasDisplayName: !!data.displayName,
+      hasFirstName: !!data.firstName,
+      hasGender: !!data.gender,
+      hasLastName: !!data.lastName,
+      hasPhotoUrl: !!data.photoUrl,
+    };
+    return User.update(params.uid, doc);
   }
 
   /**
@@ -75,7 +83,7 @@ export class User {
    * @return DocumentReference of the created user doc.
    */
   static async update(uid: string, data: UserDocument): Promise<admin.firestore.WriteResult> {
-    return this.doc(uid).set(data, {merge: true});
+    return this.doc(uid).set(data, { merge: true });
   }
 
   static async get(uid: string): Promise<UserDocument> {
