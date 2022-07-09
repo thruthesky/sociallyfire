@@ -8,7 +8,6 @@ export class FirebaseAppInitializer {
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
-
       admin.firestore().settings({ ignoreUndefinedProperties: true });
     } catch (e) {
       console.error("initialization failed; ", e);

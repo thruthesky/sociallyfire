@@ -14,3 +14,13 @@ Perfect TDD is the ultimate goal of this project. The code of `cloud functions` 
 - To test if the testing is working, run `npm run test:test`.
 
 - To test if firebase connection is working, run `npm run test:firebase-connection`.
+
+
+# Lint
+
+- See `functions/eslintrc.js` for details.
+
+# Deploy
+
+- Run `npm run deploy` to deploy to Firebase.
+  - It will do `npm run lint:fix` first and if there is no error, it will deploy.
