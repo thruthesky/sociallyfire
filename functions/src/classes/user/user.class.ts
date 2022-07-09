@@ -1,7 +1,6 @@
 import * as admin from "firebase-admin";
 import { Params } from "../../interfaces/default.interfaces";
 import { UserDocument } from "../../interfaces/user.interfaces";
-import { UserMeta } from "./user.meta.class";
 import { ERROR_USER_NOT_FOUND } from "../../defines";
 
 export class User {
@@ -23,14 +22,13 @@ export class User {
    *
    */
   static async onCreate(params: Params, data: UserDocument) {
-    return UserMeta.create(params.uid, {
-      hasBirthday: false,
-      hasDisplayName: false,
-      hasFirstName: false,
-      hasGender: false,
-      hasLastName: false,
-      hasPhotoUrl: false,
-    });
+    const got = await this.get(params.uid);
+    if (got.updated) {
+      this.doc(params.uid).update({ updated: false });
+      return;
+    }
+
+    this.doc(params.uid).update({ updated: true });
   }
 
   /**

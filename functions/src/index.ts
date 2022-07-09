@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { firebaseConfig } from "../firebase.config";
+import { firebaseConfig } from "../../firebase.config";
 
 admin.initializeApp({
   storageBucket: firebaseConfig.storageBucket,

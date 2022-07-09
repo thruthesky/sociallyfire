@@ -5,5 +5,5 @@ export const onUserCreate = functions
   .region("asia-northeast3")
   .firestore.document("/users/{uid}")
   .onCreate((snapshot, context) => {
-    return User.onCreate(context.params, snapshot.data());
+    return User.onCreate(context.params, snapshot.data() as any);
   });
