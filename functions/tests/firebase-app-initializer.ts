@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-var serviceAccount = require("../firebase.admin-key.json");
+var serviceAccount = require("../firebase.adminsdk.json");
 
 export class FirebaseAppInitializer {
   constructor() {
