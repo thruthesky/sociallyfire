@@ -37,11 +37,13 @@ When offline supported (which is the default on most of client platform), the cl
 
 # Test
 
-The TDD is the most important part of this project. The perfect TDD implementation is the ultimate goal to make this project successful.
+- The TDD is the most important part of this project. The perfect TDD implementation is the ultimate goal to make this project successful.
 
-The test codes are under `functions/tests` folder.
+- The test must be done only in firebase emulator. Do not test on real firebase project.
 
-To test, enter `functions/tests` folder first.
+- The test codes are under `functions/tests` folder.
+
+- To test, enter `functions/tests` folder first.
 
 ## Testing the test system.
 
