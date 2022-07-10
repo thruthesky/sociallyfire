@@ -33,8 +33,10 @@ export class User {
     const data = {
       registeredAt: admin.firestore.FieldValue.serverTimestamp(),
     } as UserDocument;
-    return User.update(uid, data);
+    return User.update(uid, this.applyMeta(data));
   }
+
+
 
   /**
    * This can be invoked multiple times as user updates his profile information.
@@ -49,9 +51,18 @@ export class User {
     params: { uid: string },
     data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
-    const doc = {
+    console.log('user.class::onUpdate()');
+    return User.update(params.uid, this.applyMeta(data));
+  }
+
+
+  /**
+   * 
+   * @param data 
+   */
+  static applyMeta(data: UserDocument) {
+    return {
       ...data,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       hasBirthday: !!data.birthday,
       hasDisplayName: !!data.displayName,
       hasFirstName: !!data.firstName,
@@ -59,8 +70,8 @@ export class User {
       hasLastName: !!data.lastName,
       hasPhotoUrl: !!data.photoUrl,
     };
-    return User.update(params.uid, doc);
   }
+
 
   /**
    * Creates a user document.

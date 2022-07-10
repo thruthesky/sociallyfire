@@ -12,6 +12,9 @@ export const onUserUpdate = functions
   .region("asia-northeast3")
   .firestore.document("/users/{uid}")
   .onUpdate((change, context) => {
-    if (notUpdatable(change)) return null;
+    if (notUpdatable(change)) {
+      console.log("notUpdatable()", change.before.data(), change.after.data());
+      return null;
+    }
     return User.onUpdate(context.params as { uid: string }, change.after.data() as UserDocument);
   });
