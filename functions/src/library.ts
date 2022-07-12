@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 
 export function notUpdatable(
-  change: functions.Change<functions.firestore.QueryDocumentSnapshot>
+    change: functions.Change<functions.firestore.QueryDocumentSnapshot>
 ): boolean {
   const before = change.before.data();
   const after = change.after.data();

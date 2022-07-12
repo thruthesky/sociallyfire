@@ -10,8 +10,11 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 - [TODO](#todo)
 - [Overview](#overview)
   - [Background Functions](#background-functions)
-  - [Idempotence](#idempotence)
+    - [Cloud Functions onUpdate infinite loop](#cloud-functions-onupdate-infinite-loop)
 - [Test](#test)
+  - [Two kinds of testing](#two-kinds-of-testing)
+    - [Test by units](#test-by-units)
+    - [Test with background functions](#test-with-background-functions)
   - [Testing the test system.](#testing-the-test-system)
 - [Lint](#lint)
 - [Deploy](#deploy)
@@ -19,31 +22,59 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 
 # TODO
 
-- Idempotence 를 제대로 처리해서, 두번 update 가 되지 않도록 해야 한다.
-  - `updated: boolean` 과 `context.eventId` 를 동시에 사용해서, 동일한 업데이트 작업이 두번되지 않도록 한다.
-    - 이것이 필요한 이유는, `/users/<uid>` 컬렉션 하나면 괜찮겠지만, category, post, comment, chat 등 수 많은 컬렉션에 다 meta 폴더를 만들 수가 없다.참조한다.
-  - 각 functions 의 onUpdate 에서 공통된 함수 `if (notUpdatable(change)) return null;` 를 두어서, chagne.before.data() 와 change.after.data() 의 모든 필드가 같은 값이면, return null 을 하도록 한다.
-  - 따라서, 문서에서 `updatedAt` 과 같이, 항상 업데이트 할 때 마다 변하는 값을 저장해서는 안된다.
+- See [sociallyfire github project](https://github.com/users/thruthesky/projects/4/views/1).
+
+
+
 # Overview
 
 ## Background Functions
 
-HTTP functions in Cloud Functions are so slow comparing to the direct connection to Firestore with offline support in client side.
-
-When offline supported (which is the default on most of client platform), the client will be updated before saving the data to Firestore and it is fast enough. That is why `SF` goes as `Background Functions(background event trigger)`.
+The reason why I go with `Background Functions` is very clear. HTTP functions in Cloud Functions are so slow comparing to the direct connection to Firestore with offline support. When the offline mode is supported (which is the default on most of client platform), the client will be updated before saving the data to Firestore and it is fast enough to use as a state management.
 
 
-## Idempotence
 
+### Cloud Functions onUpdate infinite loop
+
+- 
 
 
 # Test
 
-The TDD is the most important part of this project. The perfect TDD implementation is the ultimate goal to make this project successful.
+- The TDD is the most important part of this project, especially when it is written as background functions. The perfect TDD implementation is the ultimate goal to make this project successful.
 
-The test codes are under `functions/tests` folder.
+- All the test goes with the real firebase. Meaning, when the test runs, it will directly access the real firebase project. So, there might be some garbage data to be left on real project.
 
-To test, enter `functions/tests` folder first.
+- The test codes are under `functions/tests` folder.
+
+- To test, enter `functions/tests` folder first and run test like `$ npm run test:user:crud`.
+
+
+## Two kinds of testing
+
+- There are two different ways of testing.
+
+### Test by units
+
+With this test, when the source code changes, the tests runs and the results are displayed immediately.
+This is very convinient on testing small units but it does not test on the functions itself.
+
+- Simply run the tests like `% npm run test:user:create`.
+
+Note, that the test scripts that runs without background functions should be end with `.spec.ts`.
+
+### Test with background functions
+
+With this test, it will test on the background functions. So, the functions need to be deploy before running the test.
+
+- To run a test,
+  - `% npm run deploy`
+  (or deploy only the function you would like by `% firebase deploy --only functions:...`)
+  - `% npm run test:user:create.bg`
+
+
+Note, that the test scripts that runs with background functions should be end with `.bg.spec.ts`.
+
 
 ## Testing the test system.
 

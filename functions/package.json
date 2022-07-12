@@ -12,7 +12,9 @@
     "logs": "firebase functions:log",
     "test:test": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/basic/test.spec.ts",
     "test:firebase-connection": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/basic/firebase-connection.spec.ts",
-    "test:user:crud": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/crud.spec.ts"
+    "test:user:crud": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/crud.spec.ts",
+    "test:user:create": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user.create.spec.ts",
+    "test:user:create.bg": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user.create.bg.spec.ts"
   },
   "engines": {
     "node": "16"

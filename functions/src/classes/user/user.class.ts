@@ -2,7 +2,7 @@
  * @file user.class.ts
  */
 import * as admin from "firebase-admin";
-import { UserDocument } from "../../interfaces/user.interfaces";
+import { UserCreate, UserDocument } from "../../interfaces/user.interfaces";
 import { ERROR_USER_NOT_FOUND } from "../../defines";
 
 /**
@@ -30,10 +30,7 @@ export class User {
    *
    */
   static async onCreate(uid: string): Promise<admin.firestore.WriteResult> {
-    const data = {
-      registeredAt: admin.firestore.FieldValue.serverTimestamp(),
-    } as UserDocument;
-    return User.update(uid, data);
+    return User.update(uid, this.completeUserDocument({} as UserDocument));
   }
 
   /**
@@ -49,16 +46,7 @@ export class User {
     params: { uid: string },
     data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
-    const doc = {
-      ...data,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      hasBirthday: !!data.birthday,
-      hasDisplayName: !!data.displayName,
-      hasFirstName: !!data.firstName,
-      hasGender: !!data.gender,
-      hasLastName: !!data.lastName,
-      hasPhotoUrl: !!data.photoUrl,
-    };
+    const doc = this.completeUserDocument(data);
     return User.update(params.uid, doc);
   }
 
@@ -70,9 +58,8 @@ export class User {
    * @param data data to create a user document.
    * @return DocumentReference of the created user doc.
    */
-  static async create(data: UserDocument): Promise<admin.firestore.DocumentReference> {
-    data.registeredAt = admin.firestore.FieldValue.serverTimestamp();
-    return this.col.add(data);
+  static async create(data: UserCreate): Promise<admin.firestore.DocumentReference> {
+    return this.col.add(this.completeUserDocument(data as UserDocument));
   }
 
   /**
@@ -86,11 +73,47 @@ export class User {
     return this.doc(uid).set(data, { merge: true });
   }
 
+  static async delete(uid: string) {
+    return this.doc(uid).delete();
+  }
+
   static async get(uid: string): Promise<UserDocument> {
     const snapshot = await this.doc(uid).get();
     if (snapshot.exists == false) throw ERROR_USER_NOT_FOUND;
     const data = snapshot.data() as UserDocument;
     data.id = uid;
     return data;
+  }
+
+  /**
+   * Returns after completing user document fields if there are any missing ones.
+   *
+   * - purpose: `UserDocument` fields are not optional. So, it should have a complete values.
+   *
+   * @param data user document data.
+   *
+   */
+  static completeUserDocument(data: UserDocument): UserDocument {
+    data.id ??= "";
+    data.birthday ??= 0;
+    data.displayName ??= "";
+    data.firstName ??= "";
+    data.gender ??= "";
+    data.lastName ??= "";
+    data.middleName ??= "";
+    data.photoUrl ??= "";
+
+    // / If it is nullish, it means the user is creating an account.
+    data.registeredAt ??= admin.firestore.FieldValue.serverTimestamp();
+
+    return {
+      ...data,
+      hasBirthday: !!data.birthday,
+      hasDisplayName: !!data.displayName,
+      hasFirstName: !!data.firstName,
+      hasGender: !!data.gender,
+      hasLastName: !!data.lastName,
+      hasPhotoUrl: !!data.photoUrl,
+    };
   }
 }
