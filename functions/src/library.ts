@@ -3,7 +3,7 @@ import * as functions from "firebase-functions";
 // onUpdate() background trigger 에서 infinite update loop 에 빠지지 않도록 확인
 // TODO - 테스트를 해야 함.
 export function updatable(
-  change: functions.Change<functions.firestore.QueryDocumentSnapshot>
+    change: functions.Change<functions.firestore.QueryDocumentSnapshot>
 ): boolean {
   const before = change.before.data();
   const after = change.after.data();

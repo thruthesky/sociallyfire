@@ -2,8 +2,8 @@
  * @file user.class.ts
  */
 import * as admin from "firebase-admin";
-import { UserCreate, UserDocument } from "../../interfaces/user.interfaces";
-import { ERROR_USER_NOT_FOUND } from "../../defines";
+import {UserCreate, UserDocument} from "../../interfaces/user.interfaces";
+import {ERROR_USER_NOT_FOUND} from "../../defines";
 
 /**
  * User
@@ -43,8 +43,8 @@ export class User {
    *
    */
   static async onUpdate(
-    params: { uid: string },
-    data: UserDocument
+      params: { uid: string },
+      data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
     const doc = this.completeUserDocument(data);
     return User.update(params.uid, doc);
@@ -70,7 +70,7 @@ export class User {
    * @return DocumentReference of the created user doc.
    */
   static async update(uid: string, data: UserDocument): Promise<admin.firestore.WriteResult> {
-    return this.doc(uid).set(data, { merge: true });
+    return this.doc(uid).set(data, {merge: true});
   }
 
   static async delete(uid: string) {
