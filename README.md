@@ -7,10 +7,10 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 
 
 - [SociallyFire](#sociallyfire)
-- [TODO](#todo)
 - [Overview](#overview)
   - [Background Functions](#background-functions)
     - [Cloud Functions onUpdate infinite loop](#cloud-functions-onupdate-infinite-loop)
+- [Installation](#installation)
 - [Test](#test)
   - [Two kinds of testing](#two-kinds-of-testing)
     - [Test by units](#test-by-units)
@@ -20,7 +20,6 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 - [Deploy](#deploy)
 - [Database and Document Structure](#database-and-document-structure)
 
-# TODO
 
 - See [sociallyfire github project](https://github.com/users/thruthesky/projects/4/views/1).
 
@@ -36,8 +35,10 @@ The reason why I go with `Background Functions` is very clear. HTTP functions in
 
 ### Cloud Functions onUpdate infinite loop
 
-- 
 
+# Installation
+
+- To test, you need to put your firebase project's admin sdk key into `functions/firebase.admin-key.json`.
 
 # Test
 
@@ -75,6 +76,13 @@ With this test, it will test on the background functions. So, the functions need
 
 Note, that the test scripts that runs with background functions should be end with `.bg.spec.ts`.
 
+- The TDD is the most important part of this project. The perfect TDD implementation is the ultimate goal to make this project successful.
+
+- The test must be done only in firebase emulator. Do not test on real firebase project.
+
+- The test codes are under `functions/tests` folder.
+
+- To test, enter `functions/tests` folder first.
 
 ## Testing the test system.
 

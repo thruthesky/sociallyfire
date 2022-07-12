@@ -1,7 +1,6 @@
 {
   "projects": {
-    "default": "sociallyfire",
-    "sociallyfire": "sociallyfire"
+    "default": "sociallyfire"
   },
   "targets": {}
 }
