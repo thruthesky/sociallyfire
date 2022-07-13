@@ -1,9 +1,12 @@
 /**
+ * @desc Note that, this class is only dealing with `/users` collection in Firestore.
+ *        This does not handle anything about the inforation(account) in `Firebase Authentication`.
  * @file user.class.ts
  */
 import * as admin from "firebase-admin";
 import {UserCreate, UserDocument} from "../../interfaces/user.interfaces";
 import {ERROR_USER_NOT_FOUND} from "../../defines";
+import {UserRecord} from "firebase-functions/v1/auth";
 
 /**
  * User
@@ -26,11 +29,17 @@ export class User {
    * On user creation, it does not have much information. It will simply create `registeredAt` field,
    * and copy `/users/<uid>` into `/users-meta/<uid>` with some meta information.
    *
-   * @param {string} uid uid is the uid of the user
+   * @param {UserRecord} user uid is the uid of the user
    *
    */
-  static async onCreate(uid: string): Promise<admin.firestore.WriteResult> {
-    return User.update(uid, this.completeUserDocument({} as UserDocument));
+  static async onCreate(user: UserRecord): Promise<admin.firestore.WriteResult> {
+    return User.update(
+        user.uid,
+        this.completeUserDocument({
+          photoUrl: user.photoURL,
+          displayName: user.displayName,
+        } as UserDocument)
+    );
   }
 
   /**
@@ -77,12 +86,28 @@ export class User {
     return this.doc(uid).delete();
   }
 
+  /**
+   * Returns user document.
+   * @param uid uid of a user
+   */
   static async get(uid: string): Promise<UserDocument> {
     const snapshot = await this.doc(uid).get();
     if (snapshot.exists == false) throw ERROR_USER_NOT_FOUND;
     const data = snapshot.data() as UserDocument;
     data.id = uid;
     return data;
+  }
+
+  /**
+   * Returns true or false depending on the user's document existence.
+   *
+   * @usage Use this method to check if user's document is created(or existing).
+   *
+   * @param uid uid of a user
+   */
+  static async exists(uid: string): Promise<boolean> {
+    const snapshot = await User.doc(uid).get();
+    return snapshot.exists;
   }
 
   /**

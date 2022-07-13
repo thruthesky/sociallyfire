@@ -40,13 +40,21 @@ export class TestLibrary {
   }
 
   /**
+   * Delete user's document.
+   * @param uid User uid for deleting the user's document.
+   */
+  static deleteUsearDoc(uid: string): Promise<admin.firestore.WriteResult> {
+    return User.delete(uid);
+  }
+
+  /**
    * Deletes a user account and the user document under `/users` path.
    *
    * @param uid uid of the user to be deleted
    */
-  static async deleteUser(uid: string): Promise<void> {
+  static async deleteUser(uid: string): Promise<admin.firestore.WriteResult> {
     await admin.auth().deleteUser(uid);
-    await User.delete(uid);
+    return this.deleteUsearDoc(uid);
   }
 
   static async delay(time: number) {
@@ -56,15 +64,21 @@ export class TestLibrary {
   /**
    * wait until for an event to be fullfilled.
    *
-   * @param retry how many times to retry
-   * @param time dealy time in ms
    * @param callback callback function that returns true of false. If true is returns, it is fullfilled.
+   * @param time dealy time in ms
+   * @param retry how many times to retry
+   *
+   * @example
+   *    /// retry 30 times on every 0.2 second, to see if user document exists.
+   *    const re = await TestLibrary.waitUntil(() => User.exists(user.uid), 200, 30);
+   *    expect(re).equals(true);
    */
-  static async waitUntil(retry: number, time: number, callback: () => Promise<boolean>) {
+  static async waitUntil(callback: () => Promise<boolean>, time = 500, retry = 15) {
     for (let i = 0; i < retry; i++) {
       await this.delay(time);
       const re = await callback();
       if (re) return true;
+      console.log("callback() not fullfilled, yet. retry: ", i);
     }
     return false;
   }

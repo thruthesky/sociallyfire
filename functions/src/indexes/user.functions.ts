@@ -6,16 +6,18 @@ import {notUpdatable} from "../library";
 
 export const onUserCreate = functions.auth.user().onCreate((user: UserRecord) => {
   console.log("user; ", user);
-  return User.onCreate(user.uid);
+  return User.onCreate(user);
 });
 
-export const onUserUpdate = functions
-    .region("asia-northeast3")
-    .firestore.document("/users/{uid}")
+export const onUserUpdate = functions.firestore // .region("asia-northeast3")
+    .document("users/{uid}")
     .onUpdate((change, context) => {
-      if (notUpdatable(change)) {
+      console.log("-----> onUserUpdate()");
+      if (notUpdatable(change.before.data(), change.after.data())) {
         console.log("notUpdatable()", change.before.data(), change.after.data());
         return null;
+      } else {
+        console.log("-----> updatable --> going to update.");
       }
       return User.onUpdate(context.params as { uid: string }, change.after.data() as UserDocument);
     });

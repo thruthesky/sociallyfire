@@ -16,13 +16,10 @@ describe("User update", () => {
     expect(created.lastName).is.empty;
 
     await User.update(created.id, { lastName: "Song" } as UserDocument);
-    const updated = User.get(created.id);
+    const updated = await User.get(created.id);
 
     expect(updated).to.be.an("object").to.have.property("lastName").equals("Song");
+
+    await TestLibrary.deleteUsearDoc(updated.id);
   });
-  //   it("Trigger - onCreate", async () => {
-  //     await User.onCreate("abc");
-  //     const after = await User.get("abc");
-  //     expect(after.registeredAt).to.be.an("object");
-  //   });
 });

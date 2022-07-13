@@ -18,7 +18,7 @@ describe("User create in Firebase Authentication", () => {
 
     // Wait until the background function - `onUserCreate` to generate the user's document.
     // Retry 10 times on every 0.5 seconds.
-    const re = await TestLibrary.waitUntil(10, 500, async () => {
+    const re = await TestLibrary.waitUntil(async () => {
       // Check if `onUserCreate` has generated its document.
       const snapshot = await User.doc(user.uid).get();
       // If document has been generated, finish the wait by returning true.

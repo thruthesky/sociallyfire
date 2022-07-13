@@ -4,6 +4,7 @@
 import "mocha";
 import { expect } from "chai";
 import { TestLibrary } from "../test.library.class";
+import { notUpdatable, updatable } from "../../src/library";
 
 describe("Test tests", () => {
   // the tests container
@@ -19,16 +20,35 @@ describe("Test tests", () => {
     // expect(options).is.an("number");
   });
 
-  it("waitUntil 3/100 false", async () => {
-    const re = await TestLibrary.waitUntil(3, 100, async () => {
-      return false;
-    });
+  it("updatable()", () => {
+    let re = updatable({ a: "apple" }, { a: "banana" });
+    expect(re).equals(true);
+    re = updatable({ a: "apple" }, { b: "banana" });
+    expect(re).equals(true);
+    re = updatable({ c: "cherry" }, { c: "cherry" });
+    expect(re).equals(false);
+    re = notUpdatable({ c: "cherry" }, { c: "cherry" });
+    expect(re).equals(true);
+  });
+
+  it("waitUntil false", async () => {
+    const re = await TestLibrary.waitUntil(
+      async () => {
+        return false;
+      },
+      50,
+      3
+    );
     expect(re).to.be.an("boolean").equals(false);
   });
-  it("waitUntil 1/100 true", async () => {
-    const re = await TestLibrary.waitUntil(3, 100, async () => {
-      return true;
-    });
+  it("waitUntil true", async () => {
+    const re = await TestLibrary.waitUntil(
+      async () => {
+        return true;
+      },
+      100,
+      1
+    );
     expect(re).to.be.an("boolean").equals(true);
   });
 });
