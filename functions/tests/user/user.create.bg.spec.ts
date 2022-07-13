@@ -11,7 +11,7 @@ import { User } from "../../src/classes/user/user.class";
 // Initialize firebase
 new FirebaseAppInitializer();
 
-describe("User create in Firebase Autehntication", () => {
+describe("User create in Firebase Authentication", () => {
   it("Create a user account", async () => {
     // Create a user account in Firebase authentication
     const user = await TestLibrary.createUser();

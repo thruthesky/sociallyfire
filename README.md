@@ -19,13 +19,15 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 - [Lint](#lint)
 - [Deploy](#deploy)
 - [Database and Document Structure](#database-and-document-structure)
-
-
-- See [sociallyfire github project](https://github.com/users/thruthesky/projects/4/views/1).
+- [Bugs or Issues](#bugs-or-issues)
 
 
 
 # Overview
+
+- 
+- Git repo: https://github.com/thruthesky/sociallyfire
+
 
 ## Background Functions
 
@@ -44,7 +46,7 @@ The reason why I go with `Background Functions` is very clear. HTTP functions in
 
 - The TDD is the most important part of this project, especially when it is written as background functions. The perfect TDD implementation is the ultimate goal to make this project successful.
 
-- All the test goes with the real firebase. Meaning, when the test runs, it will directly access the real firebase project. So, there might be some garbage data to be left on real project.
+- All the test goes with the real firebase project. Meaning, when the test runs, it will directly access the real firebase project. So, there might be some garbage data to be left on the firebase project. It is not recommended to run the tests against the production firebase project. Instead, create a temporary firebase project and do the tests.
 
 - The test codes are under `functions/tests` folder.
 
@@ -72,6 +74,7 @@ With this test, it will test on the background functions. So, the functions need
   - `% npm run deploy`
   (or deploy only the function you would like by `% firebase deploy --only functions:...`)
   - `% npm run test:user:create.bg`
+  - See a sample code of `user.create.bg.spec.ts`(https://github.com/thruthesky/sociallyfire/blob/main/functions/tests/user/user.create.bg.spec.ts).
 
 
 Note, that the test scripts that runs with background functions should be end with `.bg.spec.ts`.
@@ -85,6 +88,8 @@ Note, that the test scripts that runs with background functions should be end wi
 - To test, enter `functions/tests` folder first.
 
 ## Testing the test system.
+
+- The `testing system` is the test codes and its enviromental configuration of `sociallyfire`. When you test the `testing system`, it will do the tests to see if everything in the `testing system` is okay.
 
 - To test if the testing is working, run `npm run test:test`.
 
@@ -120,4 +125,10 @@ Note, that the test scripts that runs with background functions should be end wi
 - We do not do `collectionQuery()` since some of the client flatform like `FlutterFlow` does not support collection group query.
 
 
+
+
+
+# Bugs or Issues
+
+- See [sociallyfire github project](https://github.com/thruthesky/sociallyfire/projects/1).
 

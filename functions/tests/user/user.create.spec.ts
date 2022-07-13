@@ -1,5 +1,5 @@
 /**
- * User CRUD test.
+ * User document creation test.
  */
 import "mocha";
 import { expect } from "chai";
