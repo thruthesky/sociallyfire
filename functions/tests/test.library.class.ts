@@ -78,7 +78,7 @@ export class TestLibrary {
       await this.delay(time);
       const re = await callback();
       if (re) return true;
-      console.log("callback() not fullfilled, yet. retry: ", i);
+      // console.log("callback() not fullfilled, yet. retry: ", i);
     }
     return false;
   }
