@@ -16,6 +16,7 @@ And It is now trying to decouple from Flutter by implementing its core parts int
     - [Test by units](#test-by-units)
     - [Test with background functions](#test-with-background-functions)
   - [Testing the test system.](#testing-the-test-system)
+  - [Testing indiviual test spec](#testing-indiviual-test-spec)
 - [Lint](#lint)
 - [Deploy](#deploy)
 - [Database and Document Structure](#database-and-document-structure)
@@ -98,6 +99,10 @@ Note, that the test scripts that runs with background functions should be end wi
 
 - To test if firebase connection is working, run `npm run test:firebase-connection`.
 
+## Testing indiviual test spec
+
+- You can add the test run script in `package.json` and run command like `npm run test:user:create`
+- You can also add test command like `mocha --require ts-node/register --watch --watch-files ... tests/user/*.spec.ts`. So, you can test many test files at once.
 
 # Lint
 

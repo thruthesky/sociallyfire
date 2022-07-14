@@ -7,15 +7,13 @@ export interface UserCreate {
   // `phone_number` is used by FlutterFlow, and ignored.
   // Since it is private information, we don't save it here.
 
-  // User name.
-  // Note, `display_name` (as kebab case) is used by FlutterFlow and is
-  // ignored. Use `displayName` instead.
-  displayName?: string;
+  // User display name.
+  // Note, `display_name` is used by FF and must be in `kebab case` to support FF.
+  display_name?: string;
 
   // User photo url.
-  // Note, `photo_url` (as kebab case) is used by FlutterFlow and is
-  // ignored. Use `photoUrl` instead.
-  photoUrl?: string;
+  // Note, `photo_url` is used by FF and must be in `kebab case` to support FF.
+  photo_url?: string;
 
   firstName?: string;
   middleName?: string;
@@ -33,16 +31,17 @@ export interface UserCreate {
  */
 export interface UserDocument {
   // `id` is the uid and is the key of the document under /users collection
+  // and the `id` field is not saved in the document.
+  // The `id` is read only and only available on reading by `get()` and it may
+  // be delivered to client.
   id: string;
-  // User name.
-  // Note, `display_name` (as kebab case) is used by FlutterFlow and is
-  // ignored. Use `displayName` instead.
-  displayName: string;
+  // User display name.
+  // Note, `display_name` is used by FF and must be in `kebab case` to support FF.
+  display_name: string;
 
   // User photo url.
-  // Note, `photo_url` (as kebab case) is used by FlutterFlow and is
-  // ignored. Use `photoUrl` instead.
-  photoUrl: string;
+  // Note, `photo_url` is used by FF and must be in `kebab case` to support FF.
+  photo_url: string;
 
   // User registration time.
   // Note, `creation_time` (as kebab case) is used by FlutterFlow and is

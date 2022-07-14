@@ -4,9 +4,9 @@
  * @file user.class.ts
  */
 import * as admin from "firebase-admin";
-import {UserCreate, UserDocument} from "../../interfaces/user.interfaces";
-import {ERROR_USER_NOT_FOUND} from "../../defines";
-import {UserRecord} from "firebase-functions/v1/auth";
+import { UserCreate, UserDocument } from "../../interfaces/user.interfaces";
+import { ERROR_USER_NOT_FOUND } from "../../defines";
+import { UserRecord } from "firebase-functions/v1/auth";
 
 /**
  * User
@@ -34,11 +34,11 @@ export class User {
    */
   static async onCreate(user: UserRecord): Promise<admin.firestore.WriteResult> {
     return User.update(
-        user.uid,
-        this.completeUserDocument({
-          photoUrl: user.photoURL,
-          displayName: user.displayName,
-        } as UserDocument)
+      user.uid,
+      this.completeUserDocument({
+        photo_url: user.photoURL,
+        display_name: user.displayName,
+      } as UserDocument)
     );
   }
 
@@ -52,8 +52,8 @@ export class User {
    *
    */
   static async onUpdate(
-      params: { uid: string },
-      data: UserDocument
+    params: { uid: string },
+    data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
     const doc = this.completeUserDocument(data);
     return User.update(params.uid, doc);
@@ -79,7 +79,7 @@ export class User {
    * @return DocumentReference of the created user doc.
    */
   static async update(uid: string, data: UserDocument): Promise<admin.firestore.WriteResult> {
-    return this.doc(uid).set(data, {merge: true});
+    return this.doc(uid).set(data, { merge: true });
   }
 
   static async delete(uid: string) {
@@ -119,26 +119,31 @@ export class User {
    *
    */
   static completeUserDocument(data: UserDocument): UserDocument {
-    data.id ??= "";
+    // data.id ??= "";
+    // if ( data.id ) delete data.id;
     data.birthday ??= 0;
-    data.displayName ??= "";
+    data.display_name ??= "";
     data.firstName ??= "";
     data.gender ??= "";
     data.lastName ??= "";
     data.middleName ??= "";
-    data.photoUrl ??= "";
+    data.photo_url ??= "";
 
     // / If it is nullish, it means the user is creating an account.
     data.registeredAt ??= admin.firestore.FieldValue.serverTimestamp();
 
-    return {
+    // eslint-disable-next-line
+    const doc = {
       ...data,
       hasBirthday: !!data.birthday,
-      hasDisplayName: !!data.displayName,
+      hasDisplayName: !!data.display_name,
       hasFirstName: !!data.firstName,
       hasGender: !!data.gender,
       hasLastName: !!data.lastName,
-      hasPhotoUrl: !!data.photoUrl,
-    };
+      hasPhotoUrl: !!data.photo_url,
+    } as any;
+    if (doc.id) delete doc.id;
+
+    return doc;
   }
 }

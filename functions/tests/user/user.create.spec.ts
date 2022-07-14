@@ -5,7 +5,7 @@ import "mocha";
 import { expect } from "chai";
 import { FirebaseAppInitializer } from "../firebase-app-initializer";
 import { TestLibrary } from "../test.library.class";
-import { User } from "../../src/classes/user/user.class";
+// import { User } from "../../src/classes/user/user.class";
 
 new FirebaseAppInitializer();
 
