@@ -8,6 +8,7 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 
 - [SociallyFire](#sociallyfire)
 - [Overview](#overview)
+- [TODO](#todo)
   - [Background Functions](#background-functions)
     - [Cloud Functions onUpdate infinite loop](#cloud-functions-onupdate-infinite-loop)
 - [Installation](#installation)
@@ -23,15 +24,18 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 - [Coding Guidelines](#coding-guidelines)
   - [Test](#test-1)
     - [waitUntil](#waituntil)
+- [Access Control List - Admin permission security](#access-control-list---admin-permission-security)
 - [Bugs or Issues](#bugs-or-issues)
 
 
 
 # Overview
 
-- 
 - Git repo: https://github.com/thruthesky/sociallyfire
 
+# TODO
+
+- See [Access Control List](#access-control-list---admin-permission-security).
 
 ## Background Functions
 
@@ -123,14 +127,20 @@ Note, that the test scripts that runs with background functions should be end wi
     - chat
 
 
-- Field names should be in camel case.
+- Collection names and field names should be in kebab case.
 
 - Time value should be the Firebase Server Timestamp.
 
-- Field name of document creation should be `createdAt`. Exceptions are like the `registeredAt` in `/users` collection.
-- Field name of document update should be `updatedAt`.
+- Field name of document creation should be `created_at`. Exceptions are like the `registered_at` in `/users` collection.
+- Field name of document update should be `updated_at`.
 
 - We do not do `collectionQuery()` since some of the client flatform like `FlutterFlow` does not support collection group query.
+
+
+- For `users` collection, the user's `id` is not saved by `sociallyfire`.
+  - But for apps that are built with `FlutterFlow`, `uid` will be automatically attached. So, `FlutterFlow` can use the `uid` of the `users` collection.
+
+- For `categories` collection, `id` is added to `/categories/<categoryDocId>` with the value of its category id. The reason is that some client platform(like `FlutterFlow`) cannot get the the document id when it queries on a `collection`.
 
 
 
@@ -163,7 +173,26 @@ describe("User create in Firebase Authentication", () => {
 ```
 
 
+# Access Control List - Admin permission security
+
+- There are roles of users to manage the contents.
+- The roles are;
+  - `admin` - who owns the system and have all the permission.
+  - `subadmin` - who has the most important permission except some critical permission like `adding another subadmin`, `deleting a category(may add a category)`, etc.
+  - number `0~9`. there are ten number roles from '0' to '9'. it's called `role level`.
+    - Each category has `role level` on `list`, `read`, `write`.
+      - A category can restricts like
+        - `list` - role level 2
+        - `read` - role level 3
+        - `write` - role level 4
+      - Then, if a user has role level 2, then he can list only.
+        - If the user has role level 3, then the user can do both of list and read. but not write.
+        - the user must have role level 4 and above to list, read, and write.
+
+
 # Bugs or Issues
 
 - See [sociallyfire github project](https://github.com/thruthesky/sociallyfire/projects/1).
+
+
 

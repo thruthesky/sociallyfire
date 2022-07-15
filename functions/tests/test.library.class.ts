@@ -11,9 +11,9 @@ export class TestLibrary {
    * user document.
    */
   static async createUserDoc(): Promise<UserDocument> {
-    const firstName = "First name-" + new Date().getTime();
+    const first_name = "First name-" + new Date().getTime();
     const ref = await User.create({
-      firstName: firstName,
+      first_name: first_name,
     } as UserDocument);
 
     const created = await User.get(ref.id);

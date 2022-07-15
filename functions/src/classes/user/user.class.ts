@@ -123,24 +123,25 @@ export class User {
     // if ( data.id ) delete data.id;
     data.birthday ??= 0;
     data.display_name ??= "";
-    data.firstName ??= "";
+    data.first_name ??= "";
     data.gender ??= "";
-    data.lastName ??= "";
-    data.middleName ??= "";
+    data.last_name ??= "";
+    data.middle_name ??= "";
     data.photo_url ??= "";
 
     // / If it is nullish, it means the user is creating an account.
-    data.registeredAt ??= admin.firestore.FieldValue.serverTimestamp();
+    data.registered_at ??= admin.firestore.FieldValue.serverTimestamp();
 
     // eslint-disable-next-line
     const doc = {
       ...data,
-      hasBirthday: !!data.birthday,
-      hasDisplayName: !!data.display_name,
-      hasFirstName: !!data.firstName,
-      hasGender: !!data.gender,
-      hasLastName: !!data.lastName,
-      hasPhotoUrl: !!data.photo_url,
+      has_birthday: !!data.birthday,
+      has_display_name: !!data.display_name,
+      has_first_name: !!data.first_name,
+      has_gender: !!data.gender,
+      has_last_name: !!data.last_name,
+      has_middle_name: !!data.middle_name,
+      has_photo_url: !!data.photo_url,
     } as any;
     if (doc.id) delete doc.id;
 

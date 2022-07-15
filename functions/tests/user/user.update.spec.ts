@@ -13,12 +13,12 @@ new FirebaseAppInitializer();
 describe("User update", () => {
   it("Update a user document", async () => {
     const created = await TestLibrary.createUserDoc();
-    expect(created.lastName).is.empty;
+    expect(created.last_name).is.empty;
 
-    await User.update(created.id, { lastName: "Song" } as UserDocument);
+    await User.update(created.id, { last_name: "Song" } as UserDocument);
     const updated = await User.get(created.id);
 
-    expect(updated).to.be.an("object").to.have.property("lastName").equals("Song");
+    expect(updated).to.be.an("object").to.have.property("last_name").equals("Song");
 
     await TestLibrary.deleteUsearDoc(updated.id);
   });

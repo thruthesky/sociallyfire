@@ -15,9 +15,9 @@ export interface UserCreate {
   // Note, `photo_url` is used by FF and must be in `kebab case` to support FF.
   photo_url?: string;
 
-  firstName?: string;
-  middleName?: string;
-  lastName?: string;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
   gender?: string;
   birthday?: number;
 }
@@ -46,14 +46,14 @@ export interface UserDocument {
   // User registration time.
   // Note, `creation_time` (as kebab case) is used by FlutterFlow and is
   // ignored. Use `registeredAt` instead.
-  registeredAt: admin.firestore.FieldValue;
+  registered_at: admin.firestore.FieldValue;
 
   // `phone_number` is used by FlutterFlow, and ignored.
   // Since it is private information, we don't save it here.
 
-  firstName: string;
-  middleName: string;
-  lastName: string;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
 
   gender: string;
   birthday: number;
@@ -61,10 +61,11 @@ export interface UserDocument {
   /**
    * For searching user who has completed their profile.
    */
-  hasDisplayName: boolean;
-  hasPhotoUrl: boolean;
-  hasFirstName: boolean;
-  hasLastName: boolean;
-  hasGender: boolean;
-  hasBirthday: boolean;
+  has_display_name: boolean;
+  has_photo_url: boolean;
+  has_first_name: boolean;
+  has_last_name: boolean;
+  has_gender: boolean;
+  has_middle_name: boolean;
+  has_birthday: boolean;
 }

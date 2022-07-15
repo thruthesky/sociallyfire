@@ -25,17 +25,17 @@ describe("User create in Firebase Authentication", () => {
     const createdDoc = await User.get(user.uid);
 
     // Do some tests
-    expect(createdDoc).to.be.an("object").to.have.property("lastName").equals("");
-    expect(createdDoc.hasLastName).equals(false);
+    expect(createdDoc).to.be.an("object").to.have.property("last_name").equals("");
+    expect(createdDoc.has_last_name).equals(false);
 
-    // Update `lastName` and that will trigger `onUserUpdate`
-    await User.update(user.uid, { lastName: "Uu" } as UserDocument);
+    // Update `last_name` and that will trigger `onUserUpdate`
+    await User.update(user.uid, { last_name: "Uu" } as UserDocument);
 
     // wait until background function - `onUserUpdate` runs.
     const reUp = await TestLibrary.waitUntil(
       async () => {
         const got = await User.get(user.uid);
-        return got.hasLastName;
+        return got.has_last_name;
       },
       500,
       20
@@ -44,7 +44,7 @@ describe("User create in Firebase Authentication", () => {
 
     const updatedDoc = await User.get(user.uid);
     console.log(updatedDoc);
-    expect(updatedDoc.hasLastName).equals(true);
+    expect(updatedDoc.has_last_name).equals(true);
 
     // Delete the user account in Firebase Authentication and delete user document under `/users` path.
     await TestLibrary.deleteUser(user.uid);
