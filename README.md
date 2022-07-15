@@ -25,6 +25,7 @@ And It is now trying to decouple from Flutter by implementing its core parts int
   - [Test](#test-1)
     - [waitUntil](#waituntil)
 - [Access Control List - Admin permission security](#access-control-list---admin-permission-security)
+  - [TODO - seucirty rule check based on user role and category roles](#todo---seucirty-rule-check-based-on-user-role-and-category-roles)
 - [Security rules](#security-rules)
 - [Bugs or Issues](#bugs-or-issues)
 
@@ -36,7 +37,11 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 
 # TODO
 
-- See [Access Control List](#access-control-list---admin-permission-security).
+- Category crud with/without bg.
+- Security test based on user role and category role - See [TODO - seucirty rule check based on user role and category roles](#todo---seucirty-rule-check-based-on-user-role-and-category-roles)
+  - See [Access Control List](#access-control-list---admin-permission-security).
+
+
 
 ## Background Functions
 
@@ -200,6 +205,8 @@ describe("User create in Firebase Authentication", () => {
         - the user must have role level 4 and above to list, read, and write.
     - If admin set the reminder forum(category) as `write_role` to `subadmin` and `comment_role` to '0', then anyone can comment on reminders but cannot create a post.
 
+## TODO - seucirty rule check based on user role and category roles
+- Need to write test code for secuirty rules.
 
 # Security rules
 
