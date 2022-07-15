@@ -9,9 +9,10 @@ import { TestLibrary } from "../test.library.class";
 
 new FirebaseAppInitializer();
 
-describe("User create", () => {
-  it("Create a user document", async () => {
-    const user = await TestLibrary.createUserDoc();
-    expect(user).to.be.an("object").to.have.ownProperty("first_name").not.to.be.empty;
+describe("Create a category", () => {
+  it("Create a category document", async () => {
+    const category = await TestLibrary.createCategoryDoc();
+    expect(category).to.be.an("object").to.have.ownProperty("id").not.to.be.empty;
+    expect(category.id).equals(category.name);
   });
 });

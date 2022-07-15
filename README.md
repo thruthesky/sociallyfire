@@ -25,6 +25,7 @@ And It is now trying to decouple from Flutter by implementing its core parts int
   - [Test](#test-1)
     - [waitUntil](#waituntil)
 - [Access Control List - Admin permission security](#access-control-list---admin-permission-security)
+- [Security rules](#security-rules)
 - [Bugs or Issues](#bugs-or-issues)
 
 
@@ -142,6 +143,14 @@ Note, that the test scripts that runs with background functions should be end wi
 
 - For `categories` collection, `id` is added to `/categories/<categoryDocId>` with the value of its category id. The reason is that some client platform(like `FlutterFlow`) cannot get the the document id when it queries on a `collection`.
 
+- Note, if you are building app with `FlutterFlow`, `users` collection will have `uid`, `email`, and `phone_number` with some other properties. the three properties - `uid, email, phone_number` are considered as priate information but `FlutterFlow` open it to public and let users search.
+  - Since those three properties are attached by `FlutterFlow` itself, the properties - `uid, email, phone_number` will be not avaiable for other apps (that are built from different paltform).
+
+
+- When a user registers (creates an account), `sociallyfire` will attach some properties to `/users` collection by `onCreate` background event.
+  - `first_name`, `middle_name`, `last_name`, `registered_at`, `gender`, `birthday`, `role`, and `has_xxxx`.
+    - App can search based on `has_xxxx` to see if a user has the value of a field `has_xxxx`.
+      - For instance, app can display only the users who have `has_display_name=true` and `has_photo=true` order by `registered_at desc`.
 
 
 
@@ -180,14 +189,24 @@ describe("User create in Firebase Authentication", () => {
   - `admin` - who owns the system and have all the permission.
   - `subadmin` - who has the most important permission except some critical permission like `adding another subadmin`, `deleting a category(may add a category)`, etc.
   - number `0~9`. there are ten number roles from '0' to '9'. it's called `role level`.
-    - Each category has `role level` on `list`, `read`, `write`.
+    - Each category has `role level` on `list_role`, `read_role`, `write_role` and `comment_role`.
       - A category can restricts like
-        - `list` - role level 2
-        - `read` - role level 3
-        - `write` - role level 4
+        - `list_role` - role level 2
+        - `read_role` - role level 3
+        - `write_role` - role level 4
+        - `commnet_role` - role level 3.
       - Then, if a user has role level 2, then he can list only.
         - If the user has role level 3, then the user can do both of list and read. but not write.
         - the user must have role level 4 and above to list, read, and write.
+    - If admin set the reminder forum(category) as `write_role` to `subadmin` and `comment_role` to '0', then anyone can comment on reminders but cannot create a post.
+
+
+# Security rules
+
+- `/users/<uid>.role` is read only on the security rule. That means, you cannot update his role property in his document.
+  - Only admin and subadmin can update the users' role property. Meaning, admin(subadmin) can give higher role to a user.
+
+
 
 
 # Bugs or Issues

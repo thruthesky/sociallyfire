@@ -11,13 +11,13 @@ new FirebaseAppInitializer();
 
 describe("Firebase connection test", () => {
   it("Create a user document", async () => {
-    const firstName = "Yo - " + new Date().getTime();
-    const ref = await User.create({
-      firstName: firstName,
+    const first_name = "Yo-" + new Date().getTime();
+    const ref = await User.create({ uid: first_name }, {
+      first_name: first_name,
     } as UserDocument);
     expect(ref).to.be.an("object");
 
     const created = await User.get(ref.id);
-    expect(created.firstName).equals(firstName);
+    expect(created.first_name).equals(first_name);
   });
 });

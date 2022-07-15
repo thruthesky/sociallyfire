@@ -7,6 +7,7 @@ import * as admin from "firebase-admin";
 import { UserCreate, UserDocument } from "../../interfaces/user.interfaces";
 import { ERROR_USER_NOT_FOUND } from "../../defines";
 import { UserRecord } from "firebase-functions/v1/auth";
+import { DocumentData, DocumentReference } from "@google-cloud/firestore";
 
 /**
  * User
@@ -26,19 +27,20 @@ export class User {
   /**
    * This is invoked on user auth creation and it is invoked only once.
    *
-   * On user creation, it does not have much information. It will simply create `registeredAt` field,
+   * On user creation, it does not have much information. It will simply create `registered_at` field,
    * and copy `/users/<uid>` into `/users-meta/<uid>` with some meta information.
    *
    * @param {UserRecord} user uid is the uid of the user
    *
    */
-  static async onCreate(user: UserRecord): Promise<admin.firestore.WriteResult> {
-    return User.update(
-      user.uid,
-      this.completeUserDocument({
-        photo_url: user.photoURL,
-        display_name: user.displayName,
-      } as UserDocument)
+  static onCreate(user: UserRecord): Promise<DocumentReference<DocumentData>> {
+    return this.create(
+      {
+        uid: user.uid,
+        photoURL: user.photoURL,
+        displayName: user.displayName,
+      },
+      {}
     );
   }
 
@@ -55,20 +57,49 @@ export class User {
     params: { uid: string },
     data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
-    const doc = this.completeUserDocument(data);
-    return User.update(params.uid, doc);
+    return User.update(params.uid, this.completeUserDocument(data));
   }
 
   /**
    * Creates a user document.
    *
-   * This will trigger [onCreate] -> [UserMeta.update] to be invoked.
+   * This will trigger [onCreate] to be invoked.
    *
-   * @param data data to create a user document.
+   * @param createData data to create a user document.
    * @return DocumentReference of the created user doc.
    */
-  static async create(data: UserCreate): Promise<admin.firestore.DocumentReference> {
-    return this.col.add(this.completeUserDocument(data as UserDocument));
+  static async create(
+    user: { uid: string; photoURL?: string; displayName?: string },
+    createData: UserCreate
+  ): Promise<admin.firestore.DocumentReference> {
+    const data = {} as UserDocument;
+
+    // / These are the default values and set only time on user account creation.
+    data.birthday ??= 0;
+    data.display_name ??= "";
+    data.first_name ??= "";
+    data.gender ??= "";
+    data.last_name ??= "";
+    data.middle_name ??= "";
+    data.photo_url ??= "";
+    data.role ??= "0";
+
+    // / If it is nullish, it means the user is creating an account.
+    data.registered_at ??= admin.firestore.FieldValue.serverTimestamp();
+
+    await this.update(
+      user.uid,
+      this.completeUserDocument({
+        ...data,
+        ...createData,
+        photo_url: user.photoURL,
+        display_name: user.displayName,
+      } as UserDocument)
+    );
+
+    return this.doc(user.uid);
+
+    // return this.col.add(this.completeUserDocument(data as UserDocument));
   }
 
   /**
@@ -119,19 +150,6 @@ export class User {
    *
    */
   static completeUserDocument(data: UserDocument): UserDocument {
-    // data.id ??= "";
-    // if ( data.id ) delete data.id;
-    data.birthday ??= 0;
-    data.display_name ??= "";
-    data.first_name ??= "";
-    data.gender ??= "";
-    data.last_name ??= "";
-    data.middle_name ??= "";
-    data.photo_url ??= "";
-
-    // / If it is nullish, it means the user is creating an account.
-    data.registered_at ??= admin.firestore.FieldValue.serverTimestamp();
-
     // eslint-disable-next-line
     const doc = {
       ...data,

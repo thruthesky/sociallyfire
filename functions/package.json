@@ -17,7 +17,8 @@
     "test:user:create.bg": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user.create.bg.spec.ts",
     "test:user:update": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user.update.spec.ts",
     "test:user:update.bg": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user.update.bg.spec.ts",
-    "test:user": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/*.spec.ts"
+    "test:user": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/*.spec.ts",
+    "test:category:create": "mocha --timeout 20000 --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/category/category.create.spec.ts"
   },
   "engines": {
     "node": "16"

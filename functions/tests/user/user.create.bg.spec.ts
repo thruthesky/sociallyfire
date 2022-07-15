@@ -35,7 +35,7 @@ describe("User create in Firebase Authentication and update through Background F
     const userDoc = await User.get(user.uid);
 
     // Do some tests
-    expect(userDoc).to.be.an("object").to.have.property("firstName").equals("");
+    expect(userDoc).to.be.an("object").to.have.property("first_name").equals("");
     expect(userDoc.id).equals(user.uid);
 
     // Delete the user account in Firebase Authentication and delete user document under `/users` path.
