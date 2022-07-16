@@ -37,9 +37,7 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 
 # TODO
 
-- Category crud with/without bg.
-- Security test based on user role and category role - See [TODO - seucirty rule check based on user role and category roles](#todo---seucirty-rule-check-based-on-user-role-and-category-roles)
-  - See [Access Control List](#access-control-list---admin-permission-security).
+- See [Github project](https://github.com/thruthesky/sociallyfire/projects/1).
 
 
 
@@ -189,21 +187,37 @@ describe("User create in Firebase Authentication", () => {
 
 # Access Control List - Admin permission security
 
-- There are roles of users to manage the contents.
-- The roles are;
-  - `admin` - who owns the system and have all the permission.
-  - `subadmin` - who has the most important permission except some critical permission like `adding another subadmin`, `deleting a category(may add a category)`, etc.
-  - number `0~9`. there are ten number roles from '0' to '9'. it's called `role level`.
-    - Each category has `role level` on `list_role`, `read_role`, `write_role` and `comment_role`.
-      - A category can restricts like
-        - `list_role` - role level 2
-        - `read_role` - role level 3
-        - `write_role` - role level 4
-        - `commnet_role` - role level 3.
-      - Then, if a user has role level 2, then he can list only.
-        - If the user has role level 3, then the user can do both of list and read. but not write.
-        - the user must have role level 4 and above to list, read, and write.
-    - If admin set the reminder forum(category) as `write_role` to `subadmin` and `comment_role` to '0', then anyone can comment on reminders but cannot create a post.
+- There are roles of users to manage their access to the contents.
+- The roles are specified in a number.
+  - The role can set between `0~999`.  it's called `role level`.
+    - Consider to use `role level` from `0` to `9` to make a simple.
+
+- `admin` is also set as role level. If a user has his role level to `999`, then he is an admin.
+  - The admin owns the system and have all the permission.
+  - Multiple users can have admin role level.
+- `subadmin` is also set as role level. If a user as his role level to `998`, then he is a subadmin.
+  - The subadmin has the most important permission like `creating a new category`, `updating a new category`, `manaing user's contents`, `blocking/unblocking users` and all most all the permission as `admin`. But some of critical permissions may be excepted like `adding another subadmin`, `deleting a category`, etc.
+
+
+- Each category has `role level` on `list_role`, `read_role`, `write_role` and `comment_role`.
+  - A category can restricts like
+    - `list_role` - role level 2
+    - `read_role` - role level 3
+    - `write_role` - role level 4
+    - `commnet_role` - role level 3.
+  - Then, if a user has role level 2, then he can list only.
+    - If the user has role level 3, then the user can do both of list and read. but not write.
+    - the user must have role level 4 and above to list, read, and write.
+  - If admin set the reminder forum(category) as `write_role` to `subadmin` and `comment_role` to '0', then anyone can comment on reminders but cannot create a post.
+
+- Each post can have `read_role` and `comment_role`.
+  - Admin can set high role to prevent users to read the post.  If the `read_role` is set to `998`, then only admin can read the post. So, it can be used to communicate with admin. The author can still do `RUD(read, update, delete)`.
+  - Admin can set high role to prevent users to comment.
+
+
+
+
+
 
 ## TODO - seucirty rule check based on user role and category roles
 - Need to write test code for secuirty rules.

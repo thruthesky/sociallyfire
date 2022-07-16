@@ -12,8 +12,10 @@ export interface CategoryDocument {
   name: string;
   description: string;
   created_at: admin.firestore.FieldValue;
-  list_role: string;
-  read_role: string;
-  write_role: string;
-  comment_role: string;
+  list_role: number;
+  read_role: number;
+  write_role: number;
+  comment_role: number;
+  no_of_posts: number;
+  no_of_comments: number;
 }

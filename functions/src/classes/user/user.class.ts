@@ -5,7 +5,7 @@
  */
 import * as admin from "firebase-admin";
 import { UserCreate, UserDocument } from "../../interfaces/user.interfaces";
-import { ERROR_USER_NOT_FOUND } from "../../defines";
+import { ERROR_USER_DOCUMENT_NOT_FOUND } from "../../defines";
 import { UserRecord } from "firebase-functions/v1/auth";
 import { DocumentData, DocumentReference } from "@google-cloud/firestore";
 
@@ -82,7 +82,7 @@ export class User {
     data.last_name ??= "";
     data.middle_name ??= "";
     data.photo_url ??= "";
-    data.role ??= "0";
+    data.role ??= 0;
 
     // / If it is nullish, it means the user is creating an account.
     data.registered_at ??= admin.firestore.FieldValue.serverTimestamp();
@@ -123,7 +123,7 @@ export class User {
    */
   static async get(uid: string): Promise<UserDocument> {
     const snapshot = await this.doc(uid).get();
-    if (snapshot.exists == false) throw ERROR_USER_NOT_FOUND;
+    if (snapshot.exists == false) throw ERROR_USER_DOCUMENT_NOT_FOUND;
     const data = snapshot.data() as UserDocument;
     data.id = uid;
     return data;

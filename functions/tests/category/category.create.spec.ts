@@ -14,5 +14,6 @@ describe("Create a category", () => {
     const category = await TestLibrary.createCategoryDoc();
     expect(category).to.be.an("object").to.have.ownProperty("id").not.to.be.empty;
     expect(category.id).equals(category.name);
+    expect(category.created_at).to.be.an("object");
   });
 });

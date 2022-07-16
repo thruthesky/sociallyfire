@@ -4,6 +4,8 @@ import { User } from "../src/classes/user/user.class";
 import { Category } from "../src/classes/category/category.class";
 import { CategoryCreate, CategoryDocument } from "../src/interfaces/category.interfaces";
 import { UserDocument } from "../src/interfaces/user.interfaces";
+import { Post } from "../src/classes/post/post.class";
+import { PostDocument } from "../src/interfaces/post.interfaces";
 
 export class TestLibrary {
   /** ********************************************************************** */
@@ -128,11 +130,30 @@ export class TestLibrary {
   /**                                                                        */
   /** ********************************************************************** */
   /** ********************************************************************** */
-  static async createCategoryDoc(): Promise<CategoryDocument> {
+  static async createCategoryDoc(data?: { uid?: string }): Promise<CategoryDocument> {
     const id = "createCategoryrDoc-" + new Date().getTime();
-    const ref = await Category.create({ id: id, name: id } as CategoryCreate);
+    if (!data) data = {};
+    if (!data.uid) {
+      const user = await this.createUserDoc();
+      data.uid = user.id;
+    }
+    const ref = await Category.create({ id: id, uid: data.uid, name: id } as CategoryCreate);
 
     const created = await Category.get(ref.id);
     return created;
+  }
+
+  /** ********************************************************************** */
+  /** ********************************************************************** */
+  /**                                                                        */
+  /**                              Post                                      */
+  /**                                                                        */
+  /** ********************************************************************** */
+  /** ********************************************************************** */
+  static async createPostDoc(): Promise<PostDocument> {
+    const category = await this.createCategoryDoc();
+    const postRef = await Post.create({ category: category.id, uid: category.uid, title: "test" });
+    const post = await Post.get(postRef.id);
+    return post;
   }
 }

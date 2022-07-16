@@ -58,7 +58,7 @@ export interface UserDocument {
   gender: string;
   birthday: number;
 
-  role: string;
+  role: number;
 
   /**
    * For searching user who has completed their profile.
