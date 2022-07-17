@@ -2,10 +2,10 @@
  *
  */
 import * as admin from "firebase-admin";
-import { ERROR_POST_DOCUMENT_NOT_FOUND } from "../../defines";
-import { PostCreate, PostDocument } from "../../interfaces/post.interfaces";
-import { Category } from "../category/category.class";
-import { User } from "../user/user.class";
+import {ERROR_POST_DOCUMENT_NOT_FOUND} from "../../defines";
+import {PostCreate, PostDocument} from "../../interfaces/post.interfaces";
+import {Category} from "../category/category.class";
+import {User} from "../user/user.class";
 export class Post {
   /**
    * Post collection reference
@@ -68,7 +68,7 @@ export class Post {
    *
    */
   static async update(id: string, data: PostDocument): Promise<admin.firestore.WriteResult> {
-    return this.doc(id).set(data, { merge: true });
+    return this.doc(id).set(data, {merge: true});
   }
 
   /**

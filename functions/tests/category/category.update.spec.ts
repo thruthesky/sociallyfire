@@ -19,4 +19,11 @@ describe("Update a category", () => {
     expect(category.id).equals(updated.id);
     expect(updated.comment_role).equals(3);
   });
+  it("Category - increase no of posts", async () => {
+    const category = await TestLibrary.createCategoryDoc();
+    await Category.increaseNoOfPosts(category.id);
+    const updated = await Category.get(category.id);
+    expect(category.id).equals(updated.id);
+    expect(updated.no_of_posts).equals(1);
+  });
 });

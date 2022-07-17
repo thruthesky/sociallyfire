@@ -4,10 +4,10 @@
  * @file user.class.ts
  */
 import * as admin from "firebase-admin";
-import { UserCreate, UserDocument } from "../../interfaces/user.interfaces";
-import { ERROR_USER_DOCUMENT_NOT_FOUND } from "../../defines";
-import { UserRecord } from "firebase-functions/v1/auth";
-import { DocumentData, DocumentReference } from "@google-cloud/firestore";
+import {UserCreate, UserDocument} from "../../interfaces/user.interfaces";
+import {ERROR_USER_DOCUMENT_NOT_FOUND} from "../../defines";
+import {UserRecord} from "firebase-functions/v1/auth";
+import {DocumentData, DocumentReference} from "@google-cloud/firestore";
 
 /**
  * User
@@ -35,12 +35,12 @@ export class User {
    */
   static onCreate(user: UserRecord): Promise<DocumentReference<DocumentData>> {
     return this.create(
-      {
-        uid: user.uid,
-        photoURL: user.photoURL,
-        displayName: user.displayName,
-      },
-      {}
+        {
+          uid: user.uid,
+          photoURL: user.photoURL,
+          displayName: user.displayName,
+        },
+        {}
     );
   }
 
@@ -54,8 +54,8 @@ export class User {
    *
    */
   static async onUpdate(
-    params: { uid: string },
-    data: UserDocument
+      params: { uid: string },
+      data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
     return User.update(params.uid, this.completeUserDocument(data));
   }
@@ -69,8 +69,8 @@ export class User {
    * @return DocumentReference of the created user doc.
    */
   static async create(
-    user: { uid: string; photoURL?: string; displayName?: string },
-    createData: UserCreate
+      user: { uid: string; photoURL?: string; displayName?: string },
+      createData: UserCreate
   ): Promise<admin.firestore.DocumentReference> {
     const data = {} as UserDocument;
 
@@ -88,13 +88,13 @@ export class User {
     data.registered_at ??= admin.firestore.FieldValue.serverTimestamp();
 
     await this.update(
-      user.uid,
-      this.completeUserDocument({
-        ...data,
-        ...createData,
-        photo_url: user.photoURL,
-        display_name: user.displayName,
-      } as UserDocument)
+        user.uid,
+        this.completeUserDocument({
+          ...data,
+          ...createData,
+          photo_url: user.photoURL,
+          display_name: user.displayName,
+        } as UserDocument)
     );
 
     return this.doc(user.uid);
@@ -105,12 +105,14 @@ export class User {
   /**
    * Updates a user document.
    *
+   * The input data object can have any keys and values.
    *
-   * @param data data to update a user document.
+   * @param data the data object to be updated to a user document.
    * @return DocumentReference of the created user doc.
    */
-  static async update(uid: string, data: UserDocument): Promise<admin.firestore.WriteResult> {
-    return this.doc(uid).set(data, { merge: true });
+  // eslint-disable-next-line
+  static async update(uid: string, data: any): Promise<admin.firestore.WriteResult> {
+    return this.doc(uid).set(data, {merge: true});
   }
 
   static async delete(uid: string) {
@@ -151,7 +153,7 @@ export class User {
    */
   static completeUserDocument(data: UserDocument): UserDocument {
     // eslint-disable-next-line
-    const doc = {
+    const doc: any = {
       ...data,
       has_birthday: !!data.birthday,
       has_display_name: !!data.display_name,
@@ -160,7 +162,8 @@ export class User {
       has_last_name: !!data.last_name,
       has_middle_name: !!data.middle_name,
       has_photo_url: !!data.photo_url,
-    } as any;
+    } as UserDocument;
+
     if (doc.id) delete doc.id;
 
     return doc;

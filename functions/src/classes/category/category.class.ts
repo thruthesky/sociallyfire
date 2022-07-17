@@ -2,8 +2,8 @@
  *
  */
 import * as admin from "firebase-admin";
-import { ERROR_CATEGORY_DOCUMENT_NOT_FOUND } from "../../defines";
-import { CategoryCreate, CategoryDocument } from "../../interfaces/category.interfaces";
+import {ERROR_CATEGORY_DOCUMENT_NOT_FOUND} from "../../defines";
+import {CategoryCreate, CategoryDocument} from "../../interfaces/category.interfaces";
 export class Category {
   /**
    * Category collection reference
@@ -25,9 +25,14 @@ export class Category {
       id: params.categoryDocId,
     });
   }
+
   static onUpdate(params: { categoryDocId: string }, data: CategoryDocument) {
     // nothing to do
-    console.log("----> Category.onUpdate(); nothing to do. Just return");
+    console.log(
+        "----> Category.onUpdate(); nothing to do. Just return",
+        params.categoryDocId,
+        data
+    );
     return null;
   }
 
@@ -54,20 +59,22 @@ export class Category {
       no_of_posts: 0,
     };
 
-    await this.update(data.id, data);
-
+    await this.doc(data.id).set(data, {merge: true});
     return this.doc(data.id);
   }
+
   /**
-   * Updates a category document with full of properties.
+   * Updates a category document with any keys and values.
    *
    * If you want to update indivisual fields, use `this.doc(...).update(...)`
    *
-   * @param data the whole category document.
+   * @param data an object that will be saved as category. It can contain any fields and values.
+   *
    *
    */
-  static async update(id: string, data: CategoryDocument): Promise<admin.firestore.WriteResult> {
-    return this.doc(id).set(data, { merge: true });
+  // eslint-disable-next-line
+  static async update(id: string, data: any): Promise<admin.firestore.WriteResult> {
+    return this.doc(id).update(data);
   }
 
   /**
@@ -82,6 +89,6 @@ export class Category {
   }
 
   static async increaseNoOfPosts(id: string) {
-    return this.doc(id).update({ no_of_posts: admin.firestore.FieldValue.increment(1) });
+    return this.update(id, {no_of_posts: admin.firestore.FieldValue.increment(1)});
   }
 }
