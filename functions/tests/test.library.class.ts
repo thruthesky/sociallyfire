@@ -135,7 +135,7 @@ export class TestLibrary {
     if (!data) data = {};
     if (!data.uid) {
       const user = await this.createUserDoc();
-      data.uid = user.id;
+      data.uid = user.uid;
     }
     const ref = await Category.create(id, { uid: data.uid, name: id } as CategoryCreate);
 

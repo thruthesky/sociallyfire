@@ -3,8 +3,9 @@ import {Post} from "../classes/post/post.class";
 import {PostCreate, PostDocument} from "../interfaces/post.interfaces";
 import {notUpdatable} from "../library";
 
-export const onPostCreate = functions.firestore
-    .document("posts/{postDocumentID}")
+export const onPostCreate = functions
+    .region("asia-northeast3")
+    .firestore.document("posts/{postDocumentID}")
     .onCreate((snapshot, context) => {
       return Post.onCreate(
       snapshot.data() as PostCreate,
@@ -12,8 +13,9 @@ export const onPostCreate = functions.firestore
       );
     });
 
-export const onPostUpdate = functions.firestore
-    .document("posts/{postDocumentID}")
+export const onPostUpdate = functions
+    .region("asia-northeast3")
+    .firestore.document("posts/{postDocumentID}")
     .onUpdate((change, context) => {
       if (notUpdatable(change.before.data(), change.after.data())) {
         return null;

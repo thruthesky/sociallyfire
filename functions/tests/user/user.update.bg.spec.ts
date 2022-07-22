@@ -43,7 +43,7 @@ describe("User create in Firebase Authentication", () => {
     expect(reUp, "reUp failed").equals(true);
 
     const updatedDoc = await User.get(user.uid);
-    console.log(updatedDoc);
+    // console.log(updatedDoc);
     expect(updatedDoc.has_last_name).equals(true);
 
     // Delete the user account in Firebase Authentication and delete user document under `/users` path.

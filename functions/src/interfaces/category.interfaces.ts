@@ -6,7 +6,9 @@ export interface CategoryCreate {
   description?: string;
 }
 export interface CategoryDocument {
-  // Read only. This [id] does not exists on database. It is only added upon document read.
+  // Read only.
+  // [id] is the category doucment id.
+  // This [id] does not exists on database. It is only added upon document read.
   // This is for convinience of accessing its document id.
   id?: string;
   uid: string;

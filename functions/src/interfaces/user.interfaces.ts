@@ -30,12 +30,8 @@ export interface UserCreate {
  * - related: `User.completeUserDocument()`.
  */
 export interface UserDocument {
-  // Read only
-  // `id` is the uid and is the key of the document under /users collection
-  // and the `id` field is not saved in the document.
-  // The `id` is read only and only available on reading by `get()` and it may
-  // be delivered to client.
-  id: string;
+  // Read only. Should not be changed after create.
+  uid: string;
   // User display name.
   // Note, `display_name` is used by FF and must be in `kebab case` to support FF.
   display_name: string;

@@ -24,10 +24,9 @@ export class User {
   }
 
   /**
-   * This is invoked on user auth creation and it is invoked only once.
+   * This is invoked on [onCreate] of firestore event trigger and update the user document with necessary properties.
    *
-   * On user creation, it does not have much information. It will simply create `registered_at` field,
-   * and copy `/users/<uid>` into `/users-meta/<uid>` with some meta information.
+   *
    *
    * @param {UserRecord} user uid is the uid of the user
    *
@@ -36,6 +35,7 @@ export class User {
     return this.update(
         user.uid,
         this.completeUserDocument({
+          uid: user.uid,
           photo_url: user.photoURL ?? "",
           display_name: user.displayName ?? "",
         } as UserDocument)
@@ -74,6 +74,7 @@ export class User {
         user.uid,
         this.completeUserDocument({
           ...createData,
+          uid: user.uid,
           photo_url: user.photoURL,
           display_name: user.displayName,
         } as UserDocument)
@@ -106,9 +107,7 @@ export class User {
   static async get(uid: string): Promise<UserDocument> {
     const snapshot = await this.doc(uid).get();
     if (snapshot.exists == false) throw ERROR_USER_DOCUMENT_NOT_FOUND;
-    const data = snapshot.data() as UserDocument;
-    data.id = uid;
-    return data;
+    return snapshot.data() as UserDocument;
   }
 
   /**

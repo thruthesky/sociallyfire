@@ -21,6 +21,7 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 - [Lint](#lint)
 - [Deploy](#deploy)
 - [Firestore database and Document Structure](#firestore-database-and-document-structure)
+  - [User Collection and Document](#user-collection-and-document)
 - [Storage structure](#storage-structure)
 - [Push message data structure](#push-message-data-structure)
 - [Access Control List - Admin permission security](#access-control-list---admin-permission-security)
@@ -139,12 +140,6 @@ Note, that the test scripts that runs with background functions should be end wi
   - singular forms
     - chat
 
-- For some client platform like `FlutterFlow` cannot generate a custom document id, `sociallyfire` will only use auto generated document id.
-
-- The documents of `categories`, `posts`, and `comments` collections have a field `deleted`.
-  - When a user deletes his posts or comment, the document is not actually deleted. Instead, it will mark as `{deleted: true}`.
-  - With this flag, client app can display the status on screen if the posts or comments are deleted.
-  - For category, app can mark as a category deleted, first. then, the can delete the category completely.
 
 - Collection names and field names should be in kebab case.
 
@@ -153,7 +148,19 @@ Note, that the test scripts that runs with background functions should be end wi
 - Field name of document creation should be `created_at`. Exceptions are like the `registered_at` in `/users` collection.
 - Field name of document update should be `updated_at`.
 
-- We do not do `collectionQuery()` since some of the client flatform like `FlutterFlow` does not support collection group query.
+- We do not do `collectionQuery()` since some of the client
+- For some client platform like `FlutterFlow` cannot generate a custom document id, `sociallyfire` will only use auto generated document id.
+
+- The documents of `categories`, `posts`, and `comments` collections have a field `deleted`.
+  - When a user deletes his posts or comment, the document is not actually deleted. Instead, it will mark as `{deleted: true}`.
+  - With this flag, client app can display the status on screen if the posts or comments are deleted.
+  - For category, app can mark as a category deleted, first. then, the can delete the category completely.
+
+ flatform like `FlutterFlow` does not support collection group query.
+
+- `Background Functions` for firestore tiggers don't have `auth` (or `context.auth`) for user verification(authentication).
+  - This means, actions that needs user verfication requires the input documents to have `uid` inside.
+    - When a user creates a `category`, `post`, or `comments`, the input object(document data) must have `uid` field to access user data. And the verification of user authentication should be done by the security rules.
 
 
 - For `users` collection, the user's `id` is not saved by `sociallyfire`.
@@ -170,6 +177,9 @@ Note, that the test scripts that runs with background functions should be end wi
     - App can search based on `has_xxxx` to see if a user has the value of a field `has_xxxx`.
       - For instance, app can display only the users who have `has_display_name=true` and `has_photo=true` order by `registered_at desc`.
 
+## User Collection and Document
+
+- `uid` is the user's uid.
 
 # Storage structure
 
@@ -251,6 +261,21 @@ describe("User create in Firebase Authentication", () => {
 });
 ```
 
+- `waitUntil` can be written with more complicated way like below.
+
+```ts
+    // Wait until the background function - `onUserCreate` to generate the user's document.
+    // Retry 10 times on every 0.5 seconds.
+    const re = await TestLibrary.waitUntil(async () => {
+      // Check if `onUserCreate` has generated its document.
+      const snapshot = await User.doc(user.uid).get();
+      // If document has been generated, finish the wait by returning true.
+      if (snapshot.exists) return true;
+      // Or return false to continue test(check) if its document has already generated.
+      else return false;
+    });
+```
+
 
 
 
@@ -260,6 +285,8 @@ describe("User create in Firebase Authentication", () => {
 - Need to write test code for secuirty rules.
 
 # Security rules
+
+- All requests of Document CRUD must have user `uid` for user verfication and secuirty validation.
 
 - `/users/<uid>.role` is read only on the security rule. That means, you cannot update his role property in his document.
   - Only admin and subadmin can update the users' role property. Meaning, admin(subadmin) can give higher role to a user.

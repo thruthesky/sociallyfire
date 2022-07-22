@@ -4,13 +4,17 @@ import {User} from "../classes/user/user.class";
 import {UserDocument} from "../interfaces/user.interfaces";
 import {notUpdatable} from "../library";
 
-export const onUserCreate = functions.auth.user().onCreate((user: UserRecord) => {
-  console.log("user; ", user);
-  return User.onCreate(user);
-});
+export const onUserCreate = functions
+    .region("asia-northeast3")
+    .auth.user()
+    .onCreate((user: UserRecord) => {
+      console.log("user; ", user);
+      return User.onCreate(user);
+    });
 
-export const onUserUpdate = functions.firestore
-    .document("users/{uid}")
+export const onUserUpdate = functions
+    .region("asia-northeast3")
+    .firestore.document("users/{uid}")
     .onUpdate((change, context) => {
       if (notUpdatable(change.before.data(), change.after.data())) {
         return null;
