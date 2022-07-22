@@ -2,17 +2,19 @@ import * as admin from "firebase-admin";
 
 export interface PostCreate {
   uid: string;
-  category: string;
+  // Category Document ID
+  categoryDocumentID: string;
   title?: string;
   content?: string;
   files?: string[];
 }
 export interface PostDocument {
   // User ID
+  // Read only. Not updatable.
   uid: string;
 
-  // Category ID
-  category: string;
+  // Category Document ID
+  categoryDocumentID: string;
 
   title: string;
   content: string;
@@ -25,4 +27,8 @@ export interface PostDocument {
 
   read_role: number;
   comment_role: number;
+
+  has_photo: boolean;
+
+  deleted: boolean;
 }

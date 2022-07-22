@@ -77,12 +77,12 @@ export class TestLibrary {
    * user document.
    */
   static async createUserDoc(): Promise<UserDocument> {
-    const first_name = "createUserDoc-" + new Date().getTime();
-    const ref = await User.create({ uid: first_name }, {
-      first_name: first_name,
+    const id = "createUserDoc-" + new Date().getTime();
+    await User.create({ uid: id }, {
+      first_name: id,
     } as UserDocument);
 
-    const created = await User.get(ref.id);
+    const created = await User.get(id);
     return created;
   }
 
@@ -137,7 +137,7 @@ export class TestLibrary {
       const user = await this.createUserDoc();
       data.uid = user.id;
     }
-    const ref = await Category.create({ id: id, uid: data.uid, name: id } as CategoryCreate);
+    const ref = await Category.create(id, { uid: data.uid, name: id } as CategoryCreate);
 
     const created = await Category.get(ref.id);
     return created;
@@ -152,7 +152,11 @@ export class TestLibrary {
   /** ********************************************************************** */
   static async createPostDoc(): Promise<PostDocument> {
     const category = await this.createCategoryDoc();
-    const postRef = await Post.create({ category: category.id, uid: category.uid, title: "test" });
+    const postRef = await Post.create({
+      categoryDocumentID: category.id!,
+      uid: category.uid,
+      title: "test",
+    });
     const post = await Post.get(postRef.id);
     return post;
   }

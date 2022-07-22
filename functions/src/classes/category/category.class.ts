@@ -19,34 +19,20 @@ export class Category {
     return this.col.doc(id);
   }
 
-  static onCreate(params: { categoryDocId: string }, data: CategoryCreate) {
-    return this.create({
-      ...data,
-      id: params.categoryDocId,
-    });
-  }
-
-  static onUpdate(params: { categoryDocId: string }, data: CategoryDocument) {
-    // nothing to do
-    console.log(
-        "----> Category.onUpdate(); nothing to do. Just return",
-        params.categoryDocId,
-        data
-    );
-    return null;
-  }
-
   /**
-   * Creates a category document.
+   * Returns the complete category document with all the neccessary properties for
+   * updating newly created category.
    *
-   * This will trigger [onCreate] to be invoked.
+   * It gets [createData] from background function and add neccessary properties on top of it.
    *
-   * @param createData data to create a user document.
-   * @return DocumentReference of the created user doc.
+   * @usage This method must be called to fill all the neccessary properties onto newly created categories.
+   *
+   * @param createData object that has minimal properties for category creation.
+   *
+   * @return Complete category document.
    */
-  static async create(createData: CategoryCreate): Promise<admin.firestore.DocumentReference> {
-    const data: CategoryDocument = {
-      id: createData.id,
+  static getInitialDocument(createData: CategoryCreate): CategoryDocument {
+    return {
       uid: createData.uid,
       name: createData.name ?? "",
       description: createData.description ?? "",
@@ -57,10 +43,57 @@ export class Category {
       comment_role: 0,
       no_of_comments: 0,
       no_of_posts: 0,
+      deleted: false,
     };
+  }
 
-    await this.doc(data.id).set(data, {merge: true});
-    return this.doc(data.id);
+  /**
+   * It completes the newly created category docuemnt with all neccessary properties.
+   *
+   * Note, this will be invoked on [onCreate] of the background functon
+   *
+   *
+   * @return 카테고리 DocumentReference
+   */
+  static async onCreate(data: CategoryCreate, params: { categoryDocumentID: string }) {
+    await this.doc(params.categoryDocumentID).set(this.getInitialDocument(data), {
+      merge: true,
+    });
+    return this.doc(params.categoryDocumentID);
+  }
+
+  /**
+   * Create a category (by programmatically)
+   *
+   * Note, the category may exists if it is invoked by background function. So, {merge: true} is needed.
+   * (FIY, since it updates with a complete category document, it can be set.)
+   *
+   * 참고, Background Function 에 의해 호출되는 경우 카테고리를 이미 생성되어 있어, merge: true 해야 한다.
+   * 참고, 만약, 카테고리가 이미 생성되어져 있지 않으면 Background Function [onCreate] 을 호출 할 수 있다.
+   *
+   * @param createData data to create a user document.
+   * @return DocumentReference of the created user doc.
+   */
+  static async create(
+      categoryDocumentID: string,
+      createData: CategoryCreate
+  ): Promise<admin.firestore.DocumentReference> {
+    await this.doc(categoryDocumentID).set(this.getInitialDocument(createData), {merge: true});
+    return this.doc(categoryDocumentID);
+  }
+
+  /**
+   * It is invoked on [onUpdate] by background function 에 의해서 카테고리 문서가 업데이트 될 때, 이 함수가 호출
+   *
+   * @attention This method has nothing to do. And not being in use.
+   *
+   * @param data category document object
+   * @param params object that has category document id
+   */
+  static onUpdate(data: CategoryDocument, params: { categoryDocumentID: string }) {
+    // nothing to do
+    console.log("This has nothing to do. Just return", params.categoryDocumentID, data);
+    return null;
   }
 
   /**
@@ -85,6 +118,7 @@ export class Category {
     const snapshot = await this.doc(id).get();
     if (snapshot.exists == false) throw ERROR_CATEGORY_DOCUMENT_NOT_FOUND;
     const data = snapshot.data() as CategoryDocument;
+    data.id = snapshot.id;
     return data;
   }
 

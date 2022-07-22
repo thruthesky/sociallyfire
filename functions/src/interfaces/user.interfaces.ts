@@ -30,6 +30,7 @@ export interface UserCreate {
  * - related: `User.completeUserDocument()`.
  */
 export interface UserDocument {
+  // Read only
   // `id` is the uid and is the key of the document under /users collection
   // and the `id` field is not saved in the document.
   // The `id` is read only and only available on reading by `get()` and it may

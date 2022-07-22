@@ -15,7 +15,7 @@ describe("Post tests", () => {
     const post = await TestLibrary.createPostDoc();
     expect(post).to.be.an("object");
 
-    const category = await Category.get(post.category);
+    const category = await Category.get(post.categoryDocumentID);
     expect(category.no_of_posts).equals(1);
   });
 });

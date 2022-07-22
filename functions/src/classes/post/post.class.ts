@@ -2,10 +2,10 @@
  *
  */
 import * as admin from "firebase-admin";
-import {ERROR_POST_DOCUMENT_NOT_FOUND} from "../../defines";
-import {PostCreate, PostDocument} from "../../interfaces/post.interfaces";
-import {Category} from "../category/category.class";
-import {User} from "../user/user.class";
+import { ERROR_POST_DOCUMENT_NOT_FOUND } from "../../defines";
+import { PostCreate, PostDocument } from "../../interfaces/post.interfaces";
+import { Category } from "../category/category.class";
+import { User } from "../user/user.class";
 export class Post {
   /**
    * Post collection reference
@@ -21,54 +21,67 @@ export class Post {
     return this.col.doc(id);
   }
 
-  static onCreate(data: PostCreate) {
-    return this.create(data);
-  }
-
-  static onUpdate(params: { categoryDocId: string }, data: PostDocument) {
-    console.log(params, data);
-  }
-
-  /**
-   * Creates a category document.
-   *
-   * This will trigger [onCreate] to be invoked.
-   *
-   * @param createData data to create a user document.
-   * @return DocumentReference of the created user doc.
-   */
-  static async create(createData: PostCreate): Promise<admin.firestore.DocumentReference> {
+  static async getInitialDocument(createData: PostCreate) {
     const user = await User.get(createData.uid);
+    const files = createData.files ?? [];
     const data: PostDocument = {
       uid: createData.uid,
-      category: createData.category,
+      categoryDocumentID: createData.categoryDocumentID,
       title: createData.title ?? "",
       content: createData.content ?? "",
-      files: createData.files ?? [],
+      files: files,
       author_name: user.display_name,
       author_photo_url: user.photo_url,
       created_at: admin.firestore.FieldValue.serverTimestamp(),
       read_role: 0,
       comment_role: 0,
+      has_photo: files.length > 0,
+      deleted: false,
     };
+    return data;
+  }
 
-    const ref = await this.col.add(data);
-
+  static doCreateWork(data: PostDocument) {
     //
-    if (createData.category) {
+    if (data.categoryDocumentID) {
       //
-      Category.increaseNoOfPosts(createData.category);
+      Category.increaseNoOfPosts(data.categoryDocumentID);
     }
+  }
 
+  static async onCreate(createData: PostCreate, params: { postDocumentID: string }) {
+    const data = await this.getInitialDocument(createData);
+    const ref = await this.doc(params.postDocumentID).set(data, { merge: true });
+    this.doCreateWork(data);
     return ref;
   }
+
+  /**
+   * Creates a category document.
+   *
+   * Note, This will trigger [onCreate] to be invoked.
+   *
+   * @param createData data to create a user document.
+   * @return DocumentReference of the created user doc.
+   */
+  static async create(createData: PostCreate): Promise<admin.firestore.DocumentReference> {
+    const data = await this.getInitialDocument(createData);
+    const ref = await this.col.add(data);
+    this.doCreateWork(data);
+    return ref;
+  }
+
+  static onUpdate(data: PostDocument, params: { postDocumentID: string }) {
+    console.log(params, data);
+  }
+
   /**
    * Updates a category document.
    *
    *
    */
   static async update(id: string, data: PostDocument): Promise<admin.firestore.WriteResult> {
-    return this.doc(id).set(data, {merge: true});
+    return this.doc(id).set(data, { merge: true });
   }
 
   /**

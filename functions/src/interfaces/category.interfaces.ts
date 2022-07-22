@@ -1,13 +1,14 @@
 import * as admin from "firebase-admin";
 
 export interface CategoryCreate {
-  id: string;
   uid: string;
   name?: string;
   description?: string;
 }
 export interface CategoryDocument {
-  id: string;
+  // Read only. This [id] does not exists on database. It is only added upon document read.
+  // This is for convinience of accessing its document id.
+  id?: string;
   uid: string;
   name: string;
   description: string;
@@ -18,4 +19,5 @@ export interface CategoryDocument {
   comment_role: number;
   no_of_posts: number;
   no_of_comments: number;
+  deleted: boolean;
 }

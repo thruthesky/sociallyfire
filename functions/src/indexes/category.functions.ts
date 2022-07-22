@@ -1,25 +1,24 @@
 import * as functions from "firebase-functions";
 import {Category} from "../classes/category/category.class";
-import {CategoryCreate, CategoryDocument} from "../interfaces/category.interfaces";
-import {notUpdatable} from "../library";
+import {CategoryCreate} from "../interfaces/category.interfaces";
 
 export const onCategoryCreate = functions.firestore
-    .document("categories/{categoryDocId}")
+    .document("categories/{categoryDocumentID}")
     .onCreate((snapshot, context) => {
       return Category.onCreate(
-      context.params as { categoryDocId: string },
-      snapshot.data() as CategoryCreate
+      snapshot.data() as CategoryCreate,
+      context.params as { categoryDocumentID: string }
       );
     });
 
-export const onCategoryUpdate = functions.firestore
-    .document("categories/{categoryDocId}")
-    .onUpdate((change, context) => {
-      if (notUpdatable(change.before.data(), change.after.data())) {
-        return null;
-      }
-      return Category.onUpdate(
-      context.params as { categoryDocId: string },
-      change.after.data() as CategoryDocument
-      );
-    });
+// export const onCategoryUpdate = functions.firestore
+//   .document("categories/{categoryDocumentID}")
+//   .onUpdate((change, context) => {
+//     if (notUpdatable(change.before.data(), change.after.data())) {
+//       return null;
+//     }
+//     return Category.onUpdate(
+//       change.after.data() as CategoryDocument,
+//       context.params as { categoryDocumentID: string }
+//     );
+//   });
