@@ -55,6 +55,12 @@ export interface UserDocument {
   gender: string;
   birthday: number;
 
+
+  /**
+   * User role level
+   * If this is 888, then the user is sub-admin
+   * If this is 999, then the user is super-admin.
+   */
   role: number;
 
   /**
@@ -67,4 +73,5 @@ export interface UserDocument {
   has_gender: boolean;
   has_middle_name: boolean;
   has_birthday: boolean;
+
 }
