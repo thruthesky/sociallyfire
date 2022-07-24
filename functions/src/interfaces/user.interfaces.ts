@@ -55,14 +55,22 @@ export interface UserDocument {
   gender: string;
   birthday: number;
 
-
   /**
    * User role level
    * If this is 888, then the user is sub-admin
    * If this is 999, then the user is super-admin.
    */
   role: number;
+}
 
+/**
+ * UserMetaDocument
+ *
+ * 참고, 사용자 문서의 모든 필드와 값을 그대로 복사해서 저장한다. 그리고 추가로 meta 정보를 저장한다.
+ *
+ */
+export interface UserMetaDocument extends UserDocument {
+  updated_at: admin.firestore.FieldValue;
   /**
    * For searching user who has completed their profile.
    */
@@ -73,5 +81,4 @@ export interface UserDocument {
   has_gender: boolean;
   has_middle_name: boolean;
   has_birthday: boolean;
-
 }

@@ -4,9 +4,9 @@
  * @file user.class.ts
  */
 import * as admin from "firebase-admin";
-import {UserCreate, UserDocument} from "../../interfaces/user.interfaces";
-import {ERROR_USER_DOCUMENT_NOT_FOUND} from "../../defines";
-import {UserRecord} from "firebase-functions/v1/auth";
+import { UserCreate, UserDocument, UserMetaDocument } from "../../interfaces/user.interfaces";
+import { ERROR_USER_DOCUMENT_NOT_FOUND } from "../../defines";
+import { UserRecord } from "firebase-functions/v1/auth";
 
 /**
  * User
@@ -22,6 +22,12 @@ export class User {
   static doc(uid: string): admin.firestore.DocumentReference<admin.firestore.DocumentData> {
     return this.col.doc(uid);
   }
+  static get metaCol(): admin.firestore.CollectionReference<admin.firestore.DocumentData> {
+    return admin.firestore().collection("users-meta");
+  }
+  static metaDoc(uid: string): admin.firestore.DocumentReference<admin.firestore.DocumentData> {
+    return this.metaCol.doc(uid);
+  }
 
   /**
    * This is invoked on [onCreate] of firestore event trigger and update the user document with necessary properties.
@@ -33,12 +39,35 @@ export class User {
    */
   static onCreate(user: UserRecord): Promise<admin.firestore.WriteResult> {
     return this.update(
-        user.uid,
-        this.completeUserDocument({
-          uid: user.uid,
-          photo_url: user.photoURL ?? "",
-          display_name: user.displayName ?? "",
-        } as UserDocument)
+      user.uid,
+      this.completeUserDocument({
+        uid: user.uid,
+        photo_url: user.photoURL ?? "",
+        display_name: user.displayName ?? "",
+      } as UserDocument)
+    );
+  }
+
+  /**
+   * Creates a user document.
+   *
+   * This will trigger [onCreate] to be invoked.
+   *
+   * @param createData data to create a user document.
+   * @return DocumentReference of the created user doc.
+   */
+  static async create(
+    user: { uid: string; photoURL?: string; displayName?: string },
+    createData: UserCreate
+  ): Promise<admin.firestore.WriteResult> {
+    return this.update(
+      user.uid,
+      this.completeUserDocument({
+        ...createData,
+        uid: user.uid,
+        photo_url: user.photoURL,
+        display_name: user.displayName,
+      } as UserDocument)
     );
   }
 
@@ -52,35 +81,12 @@ export class User {
    *
    */
   static async onUpdate(
-      params: { uid: string },
-      data: UserDocument
+    params: { uid: string },
+    data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
-    return User.update(params.uid, this.completeUserDocument(data));
-  }
-
-  /**
-   * Creates a user document.
-   *
-   * This will trigger [onCreate] to be invoked.
-   *
-   * @param createData data to create a user document.
-   * @return DocumentReference of the created user doc.
-   */
-  static async create(
-      user: { uid: string; photoURL?: string; displayName?: string },
-      createData: UserCreate
-  ): Promise<admin.firestore.WriteResult> {
-    return this.update(
-        user.uid,
-        this.completeUserDocument({
-          ...createData,
-          uid: user.uid,
-          photo_url: user.photoURL,
-          display_name: user.displayName,
-        } as UserDocument)
-    );
-
-    // return this.col.add(this.completeUserDocument(data as UserDocument));
+    data = this.completeUserDocument(data);
+    await this.update(params.uid, data);
+    return this.updateMeta(params.uid, data);
   }
 
   /**
@@ -93,7 +99,25 @@ export class User {
    */
   // eslint-disable-next-line
   static async update(uid: string, data: UserDocument): Promise<admin.firestore.WriteResult> {
-    return this.doc(uid).set(this.completeUserDocument(data), {merge: true});
+    data = this.completeUserDocument(data);
+    await this.doc(uid).set(data, { merge: true });
+    return this.updateMeta(uid, data);
+  }
+
+  static async updateMeta(uid: string, data: UserDocument) {
+    // eslint-disable-next-line
+    const doc = {
+      ...data,
+      has_birthday: !!data.birthday,
+      has_display_name: !!data.display_name,
+      has_first_name: !!data.first_name,
+      has_gender: !!data.gender,
+      has_last_name: !!data.last_name,
+      has_middle_name: !!data.middle_name,
+      has_photo_url: !!data.photo_url,
+    } as UserMetaDocument;
+
+    return this.metaDoc(uid).set(doc);
   }
 
   static async delete(uid: string) {
@@ -123,9 +147,9 @@ export class User {
   }
 
   /**
-   * Returns after completing user document fields if there are any missing ones.
+   * 사용자 문서에서 빠진 필드가 있으면 기본 값으로 채워 리턴
    *
-   * - purpose: `UserDocument` fields are not optional. So, it should have a complete values.
+   * 사용 예, 회원 가입을 처음 할 때, 사용자 계정을 처음 생성할 때, 모든 필드에 기본 값을 채우기 위해서 사용.
    *
    * @param data user document data.
    *
@@ -145,19 +169,8 @@ export class User {
     data.registered_at ??= admin.firestore.FieldValue.serverTimestamp();
 
     // eslint-disable-next-line
-    const doc: any = {
-      ...data,
-      has_birthday: !!data.birthday,
-      has_display_name: !!data.display_name,
-      has_first_name: !!data.first_name,
-      has_gender: !!data.gender,
-      has_last_name: !!data.last_name,
-      has_middle_name: !!data.middle_name,
-      has_photo_url: !!data.photo_url,
-    } as UserDocument;
+    delete (data as any).id;
 
-    if (doc.id) delete doc.id;
-
-    return doc;
+    return data;
   }
 }

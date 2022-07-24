@@ -172,10 +172,12 @@ Note, that the test scripts that runs with background functions should be end wi
   - Since those three properties are attached by `FlutterFlow` itself, the properties - `uid, email, phone_number` will be not avaiable for other apps (that are built from different paltform).
 
 
-- When a user registers (creates an account), `Fire Engine` will attach some properties to `/users` collection by `onCreate` background event.
-  - `first_name`, `middle_name`, `last_name`, `registered_at`, `gender`, `birthday`, `role`, and `has_xxxx`.
-    - App can search based on `has_xxxx` to see if a user has the value of a field `has_xxxx`.
-      - For instance, app can display only the users who have `has_display_name=true` and `has_photo=true` order by `registered_at desc`.
+- 사용자 계정 생성 또는 정보 업데이트를 할 때, `FireEngine` 이 사진이나 기타 정보를 업로드하는지 체크해서 `/users-meta` 컬렉션에 사용자 문서의 모든 필드와 값을 복사하고 추가로 `has_photo` 와 같은 `has_xxx` 등의 메타 정보가 기타 메타 정보를 추가한다.
+  - 예를 들면, 사용자가 프로필 사진을 추가 했으면, `/users-meta/<uid>.has_photo_url` 의 값이 true 가 된다.
+  - 사용자 메타 정보 문서를 `/users/<uid>/meta` 에 저장하지 않고, 최 상위에 저장하는 이유는 `FlutterFlow` 와 같이 어떤 클라이언트 플랫폼에서는 Firestore 의 `collection group query` 를 사용 할 수 없기 때문이다.
+  - 이런 meta 방식은 `posts` 나 `comments` 에도 동일하게 적용된다.
+  - 업데이트가 있는 경우, 동일한 문서에 업데이트 하지 않는 이유는 아무리 코딩을 조심해서 해도, background functions 의 `onUpdate` event trigger 에서 무한 루프를 돌 가능성이 있기 때문이다. 특히, 문서를 업데이트 할 때, 개발자가 미리 정의되지 않은 임의의 필드와 값을 저장할 수 있으므로 더욱 (무한 업데이트 루프 방지) 개발이 어렵게 된다.
+
 
 ## User Collection and Document
 
