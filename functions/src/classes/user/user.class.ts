@@ -141,14 +141,32 @@ export class User {
   }
 
   /**
-   * Returns true or false depending on the user's document existence.
+   * 사용자 문서가 존재하는지 확인.
+   *
+   * 사용 예,
+   *  - 사용자가 가입하거나 테스트 등에서 문서를 생성한 후에 그 문서가 올바로 생성되었는지 등 확인 할 때 사용
+   *  - 또는 사용자 문서가 존재하는지를 확인 할 때에도 사용.
    *
    * @usage Use this method to check if user's document is created(or existing).
    *
    * @param uid uid of a user
    */
   static async exists(uid: string): Promise<boolean> {
-    const snapshot = await User.doc(uid).get();
+    const snapshot = await this.doc(uid).get();
+    return snapshot.exists;
+  }
+
+  /**
+   * 사용자 meta 문서가 존재하는지 확인.
+   *
+   * 사용 예,
+   *  - 사용자가 가입하거나 테스트 등에서 문서를 생성한 후에 사용자의 meta 문서가 올바로 생성되었는지 등 확인 할 때 사용
+   *  - 테스트 등에서, 사용자 문서를 생성하고, meta 문서가 생성될 때 까지 wait 등을 할 수 있다.
+   *
+   * @param uid uid of a user
+   */
+  static async metaExists(uid: string): Promise<boolean> {
+    const snapshot = await this.metaDoc(uid).get();
     return snapshot.exists;
   }
 

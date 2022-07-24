@@ -1,16 +1,16 @@
 # Fire Engine
 
-`Fire Engine` (FE) is a framework to help building Soical apps.
+`Fire Engine` 은 소셜 앱, 쇼핑몰 앱, 커뮤니티 앱 등을 만들기 위한 Firebase Cloud Functions 백엔드 툴입니다.
 
-It is a derived version of [fireflutter](https://pub.dev/packages/fireflutter) that is tightly coupled with Flutter.
-And It is now trying to decouple from Flutter by implementing its core parts into cloud functions(event trigger). So, the final version of `Fire Engine` would work as frame agnostic.
+오직, `Background Functions` 로 동작을 하며 그에 따라 클라이언트에서 매우 빠르게 데이터 조작을 할 수 있습니다. 예를 들면, `Vue` 또는 `Flutter` 에서 Firestore 로 코멘트 저장하면 `Fire Engine` 이 동작하여 푸시 알림을 보내거나 코멘트 트리(들여쓰기) 형식에 맞추어 적절히 저장을 합니다.
+
+
 
 
 - [Fire Engine](#fire-engine)
-- [Overview](#overview)
-- [TODO](#todo)
-  - [Background Functions](#background-functions)
-    - [Cloud Functions onUpdate infinite loop](#cloud-functions-onupdate-infinite-loop)
+- [개요](#개요)
+  - [해야 할 작업 목록](#해야-할-작업-목록)
+  - [백그라운드 함수만 사용하는 이유](#백그라운드-함수만-사용하는-이유)
 - [Installation](#installation)
 - [Test](#test)
   - [Two kinds of testing](#two-kinds-of-testing)
@@ -41,23 +41,22 @@ And It is now trying to decouple from Flutter by implementing its core parts int
 
 
 
-# Overview
+# 개요
 
-- Git repo: https://github.com/thruthesky/Fire Engine
+- 깃허브 소스 저장소: https://github.com/thruthesky/fire-engine
 
-# TODO
+## 해야 할 작업 목록
 
-- See [Github project](https://github.com/thruthesky/Fire Engine/projects/1).
-
-
-
-## Background Functions
-
-The reason why I go with `Background Functions` is very clear. HTTP functions in Cloud Functions are so slow comparing to the direct connection to Firestore with offline support. When the offline mode is supported (which is the default on most of client platform), the client will be updated before saving the data to Firestore and it is fast enough to use as a state management.
+- [깃허브 프로젝트 참고](https://github.com/thruthesky/Fire Engine/projects/1).
 
 
 
-### Cloud Functions onUpdate infinite loop
+## 백그라운드 함수만 사용하는 이유
+
+- HTTP Functions 를 쓰면 클라이언트에서 서버로 TCP 접속을 하기 위해서 소모되는 시간과 Firestore 에서 데이터를 읽어 클라이언트로 전송하는 등 많은 시간이 소모됩니다. 특히, Firebase hosting 에서 Cloud Functions 로 접속하는 경우 오직 us-central1 서버만 사용해야하는 최악의 상황에 놓이게 된다.
+  - 클라이언트에서 Firestore 에 직접 액세스하는 경우 소켓 접속이 항상 유지되므로 Connectionless 방식의 TCP 접속 시간이 소모되지 않는다.
+  - 또한 클라이언트에서 Offline support 를 통해서 문서를 로컬에서 저장 및 읽기를 하므로 매우 빠르게 문서를 액세스 할 수 있다.
+  이러한 장점으로 인해서 오직 Background Functions 만 사용한다.
 
 
 # Installation
