@@ -5,7 +5,7 @@
  * 그렇지 않으면, update() 명령 자체가 실패해 버려서, Security Rules 가 적용되지(테스트되지) 못한다.
  */
 const firebase = require("@firebase/testing");
-const TEST_PROJECT_ID = "withcenter-test-project";
+const TEST_PROJECT_ID = "sociallyfire";
 
 const A = "user_A";
 const B = "user_B";
@@ -23,17 +23,13 @@ const userB = db(authB).collection("users").doc(B);
 
 // 특정 사용자 권한이 있는 (사용자 auth 로 로그인을 한) DB 커넥션을 가져온다.
 function db(auth = null) {
-  return firebase
-    .initializeTestApp({ projectId: TEST_PROJECT_ID, auth: auth })
-    .firestore();
+  return firebase.initializeTestApp({ projectId: TEST_PROJECT_ID, auth: auth }).firestore();
 }
 
 // 특정 사용자가 아닌, 관리자 권한이 있는 DB 커넥션을 가져온다.
 // 주의, 관리자로 로그인을 한 경우는 Secuirty 검사를 하지 않고 통과한다.
 function admin() {
-  return firebase
-    .initializeAdminApp({ projectId: TEST_PROJECT_ID })
-    .firestore();
+  return firebase.initializeAdminApp({ projectId: TEST_PROJECT_ID }).firestore();
 }
 
 // 사용자 A,B 의 정보를 가져온다.
@@ -118,9 +114,7 @@ describe("Fire Engine - Firestore Security Test", () => {
     await succeeds(testDoc.get());
   });
   it("Readonly - write fail", async () => {
-    await firebase.assertFails(
-      db().collection("readonly").doc("testDoc").set({})
-    );
+    await firebase.assertFails(db().collection("readonly").doc("testDoc").set({}));
   });
 
   it("User - create ok", async () => {
