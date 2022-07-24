@@ -1,10 +1,6 @@
 # Fire Engine
 
-`Fire Engine` 은 소셜 앱, 쇼핑몰 앱, 커뮤니티 앱 등을 만들기 위한 Firebase Cloud Functions 백엔드 툴입니다.
-
-오직, `Background Functions` 로 동작을 하며 그에 따라 클라이언트에서 매우 빠르게 데이터 조작을 할 수 있습니다. 예를 들면, `Vue` 또는 `Flutter` 에서 Firestore 로 코멘트 저장하면 `Fire Engine` 이 동작하여 푸시 알림을 보내거나 코멘트 트리(들여쓰기) 형식에 맞추어 적절히 저장을 합니다.
-
-
+`Fire Engine` 은 소셜 앱, 쇼핑몰 앱, 커뮤니티 앱 등을 만들기 위한 Firebase Cloud Functions 백엔드 툴이다.
 
 
 - [Fire Engine](#fire-engine)
@@ -56,7 +52,11 @@
 - HTTP Functions 를 쓰면 클라이언트에서 서버로 TCP 접속을 하기 위해서 소모되는 시간과 Firestore 에서 데이터를 읽어 클라이언트로 전송하는 등 많은 시간이 소모됩니다. 특히, Firebase hosting 에서 Cloud Functions 로 접속하는 경우 오직 us-central1 서버만 사용해야하는 최악의 상황에 놓이게 된다.
   - 클라이언트에서 Firestore 에 직접 액세스하는 경우 소켓 접속이 항상 유지되므로 Connectionless 방식의 TCP 접속 시간이 소모되지 않는다.
   - 또한 클라이언트에서 Offline support 를 통해서 문서를 로컬에서 저장 및 읽기를 하므로 매우 빠르게 문서를 액세스 할 수 있다.
-  이러한 장점으로 인해서 오직 Background Functions 만 사용한다.
+  - 이러한 장점으로 인해 클라이언트 개발을 할 때 (`Vue` 또는 `Flutter` 등) Firestore 로 코멘트 저장하면 매우 빠르게 클라이언트가 반응하고, `Fire Engine` 가 `Background Functions` 방식으로 동작하여 푸시 알림을 보내거나 코멘트 트리(들여쓰기) 형식에 맞추어 적절히 저장을 한다.
+  즉, `HTTP Functions` 방식에 비해 클라이언트 개발이 쉬워지면서 반응 속도도 더 빨라 백그라운드 함수 방식을 사용하는 것이다.
+
+- 참고로 어떤 클라이언트 개발 툴(`FlutterFlow`)은 `Callable Functions`를 지원하지 않아, `Callable Functions` 개발을 하지 않는다.
+
 
 
 # Installation
