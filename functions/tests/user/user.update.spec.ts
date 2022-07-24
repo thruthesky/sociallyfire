@@ -19,13 +19,14 @@ describe("User update", () => {
       last_name: "Song",
       photo_url: "https://.....png",
     } as UserDocument);
-    const updated = await User.get(created.uid);
+    const meta = await User.getMeta(created.uid);
 
-    expect(updated).to.be.an("object").to.have.property("last_name").equals("Song");
-    expect(updated.has_last_name).equals(true);
-    expect(updated.has_photo_url).equals(true);
-    expect(updated.has_birthday).equals(false);
+    expect(meta).to.be.an("object").to.have.property("last_name").equals("Song");
 
-    await TestLibrary.deleteUsearDoc(updated.uid);
+    expect(meta.has_last_name).equals(true);
+    expect(meta.has_photo_url).equals(true);
+    expect(meta.has_birthday).equals(false);
+
+    await TestLibrary.deleteUsearDoc(meta.uid);
   });
 });

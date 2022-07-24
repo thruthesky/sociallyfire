@@ -5,7 +5,7 @@
  */
 import * as admin from "firebase-admin";
 import { UserCreate, UserDocument, UserMetaDocument } from "../../interfaces/user.interfaces";
-import { ERROR_USER_DOCUMENT_NOT_FOUND } from "../../defines";
+import { ERROR_USER_DOCUMENT_NOT_FOUND, ERROR_USER_META_DOCUMENT_NOT_FOUND } from "../../defines";
 import { UserRecord } from "firebase-functions/v1/auth";
 
 /**
@@ -72,9 +72,9 @@ export class User {
   }
 
   /**
-   * This can be invoked multiple times as user updates his profile information.
+   * Background Functions 의 `onUpdate` event trigger.
    *
-   * Update (Not create or set) the profile document.
+   * 반복 업데이트 루프를 피하기 위해서, 현재 사용자 문서를 다시 업데이트하지 않는다. 대신, meta 에 저장한다.
    *
    * @param {object} params params.uid is the uid of the user
    * @param {UserDocument} data data to update as the user profile
@@ -84,9 +84,7 @@ export class User {
     params: { uid: string },
     data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
-    data = this.completeUserDocument(data);
-    await this.update(params.uid, data);
-    return this.updateMeta(params.uid, data);
+    return this.updateMeta(params.uid, this.completeUserDocument(data));
   }
 
   /**
@@ -106,8 +104,10 @@ export class User {
 
   static async updateMeta(uid: string, data: UserDocument) {
     // eslint-disable-next-line
-    const doc = {
+    const doc: UserMetaDocument = {
       ...data,
+      uid: uid,
+      updated_at: admin.firestore.FieldValue.serverTimestamp(),
       has_birthday: !!data.birthday,
       has_display_name: !!data.display_name,
       has_first_name: !!data.first_name,
@@ -115,7 +115,7 @@ export class User {
       has_last_name: !!data.last_name,
       has_middle_name: !!data.middle_name,
       has_photo_url: !!data.photo_url,
-    } as UserMetaDocument;
+    };
 
     return this.metaDoc(uid).set(doc);
   }
@@ -132,6 +132,12 @@ export class User {
     const snapshot = await this.doc(uid).get();
     if (snapshot.exists == false) throw ERROR_USER_DOCUMENT_NOT_FOUND;
     return snapshot.data() as UserDocument;
+  }
+
+  static async getMeta(uid: string): Promise<UserMetaDocument> {
+    const snapshot = await this.metaDoc(uid).get();
+    if (snapshot.exists == false) throw ERROR_USER_META_DOCUMENT_NOT_FOUND;
+    return snapshot.data() as UserMetaDocument;
   }
 
   /**

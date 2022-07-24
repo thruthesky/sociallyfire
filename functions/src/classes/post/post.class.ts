@@ -2,10 +2,10 @@
  *
  */
 import * as admin from "firebase-admin";
-import {ERROR_POST_DOCUMENT_NOT_FOUND} from "../../defines";
-import {PostCreate, PostDocument} from "../../interfaces/post.interfaces";
-import {Category} from "../category/category.class";
-import {User} from "../user/user.class";
+import { ERROR_POST_DOCUMENT_NOT_FOUND } from "../../defines";
+import { PostCreate, PostDocument } from "../../interfaces/post.interfaces";
+import { Category } from "../category/category.class";
+import { User } from "../user/user.class";
 export class Post {
   /**
    * Post collection reference
@@ -44,7 +44,12 @@ export class Post {
     return data;
   }
 
-  static doCreateWork(data: PostDocument) {
+  /**
+   * 카테고리 글 개수 업데이트 및 posts-meta 정보 등, 글 생성 또는 수정 후, 필요한 작업을 한다.
+   *
+   * @param data post document
+   */
+  static updatePostMeta(data: PostDocument) {
     //
     if (data.categoryDocumentID) {
       //
@@ -54,8 +59,8 @@ export class Post {
 
   static async onCreate(createData: PostCreate, params: { postDocumentID: string }) {
     const data = await this.getInitialDocument(createData);
-    const ref = await this.doc(params.postDocumentID).set(data, {merge: true});
-    this.doCreateWork(data);
+    const ref = await this.doc(params.postDocumentID).set(data, { merge: true });
+    this.updatePostMeta(data);
     return ref;
   }
 
@@ -70,7 +75,7 @@ export class Post {
   static async create(createData: PostCreate): Promise<admin.firestore.DocumentReference> {
     const data = await this.getInitialDocument(createData);
     const ref = await this.col.add(data);
-    this.doCreateWork(data);
+    this.updatePostMeta(data);
     return ref;
   }
 
@@ -84,7 +89,7 @@ export class Post {
    *
    */
   static async update(id: string, data: PostDocument): Promise<admin.firestore.WriteResult> {
-    return this.doc(id).set(data, {merge: true});
+    return this.doc(id).set(data, { merge: true });
   }
 
   /**

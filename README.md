@@ -177,6 +177,9 @@ Note, that the test scripts that runs with background functions should be end wi
   - 사용자 메타 정보 문서를 `/users/<uid>/meta` 에 저장하지 않고, 최 상위에 저장하는 이유는 `FlutterFlow` 와 같이 어떤 클라이언트 플랫폼에서는 Firestore 의 `collection group query` 를 사용 할 수 없기 때문이다.
   - 이런 meta 방식은 `posts` 나 `comments` 에도 동일하게 적용된다.
   - 업데이트가 있는 경우, 동일한 문서에 업데이트 하지 않는 이유는 아무리 코딩을 조심해서 해도, background functions 의 `onUpdate` event trigger 에서 무한 루프를 돌 가능성이 있기 때문이다. 특히, 문서를 업데이트 할 때, 개발자가 미리 정의되지 않은 임의의 필드와 값을 저장할 수 있으므로 더욱 (무한 업데이트 루프 방지) 개발이 어렵게 된다.
+  - `xxxxx-meta` 문서에는 원본 문서의 모든 정보가 다 들어가 있으므로, `meta` 를 직접 검색해서 내용을 보여 줄 수 있다.
+    - 예를 들어, 사용자 프로필 사진을 업로드한 사용자만 표시하고 싶다면, `users-meta` 폴더만 검색해서 그 문서 안의 사용자 이름, 생년월일, 성별 등을 사용 할 수 있다.
+    - 이것은 `posts-meta` 와 `comments-meta` 도 동일한다.
 
 
 ## User Collection and Document
