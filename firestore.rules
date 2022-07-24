@@ -1,9 +1,6 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
-    }
     // TEST Readonly
     match /readonly/{docId} {
       allow read: if true;
@@ -13,28 +10,166 @@ service cloud.firestore {
       allow read: if true;
       allow create: if true;
       allow update: if 
-        // User cannot update his role except admin.
         (notUpdating(['role']) || isAdmin())
         && notUpdating(['registered_at', 'uid'])
-        && (request.auth.uid == uid);
+        && ((request.auth.uid == uid) || isAdmin());
       allow delete: if false;
     }
+
+
+    match /categories/{categoryDocumentID} {
+      allow read: if true;
+      allow create: if isAdmin() && required(['id', 'uid']) && willBeMyDoc();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /posts/{postDocumentID} {
+      allow get: if myRole() >= postCategory(postDocumentID, 'role_read');
+      allow list: if myRole() >= postCategory(postDocumentID, 'role_list');
+      allow create: if
+        required(['categoryDocumentID', 'uid']) &&
+        categoryExists() &&
+        myRole() >= category(request.resource.data.categoryDocumentID, 'role_write') &&
+        willBeMyDoc()
+      ;
+
+
+      // Post update rule;
+      // - The document must belong to the creator
+      // - The creator and admin cannot update likes with other properties.
+      // - The creator, admin and other users can update likes only if `likes` fields are updated.
+      allow update: if
+        (isMyDoc() && willBeMyDoc() && notUpdating(['likes']))
+        ||
+        (isAdmin() && notUpdating(['likes']))
+        ||
+        (
+          onlyUpdating(['likes'])
+          &&
+          (
+            request.resource.data.likes.hasAll(resource.data.likes.removeAll([request.auth.uid]))
+            ||
+            request.resource.data.likes.hasAll(resource.data.likes.concat([request.auth.uid]))
+          )
+        )
+      ;
+      // Post deletion is not allowed where there is a comment.
+      // Instead, it can be marked as {deleted: true}
+      allow delete: if (isAdmin() || isMyDoc()) && resource.data.no_of_comments == 0;
+    }
+
+
     function isAdmin() {
       let role = get(/databases/$(database)/documents/users/$(request.auth.uid)).data['role'];
+      // let d = debug("***** role *****");
+      // let dd = debug(role);
       return role == 888 || role == 999;
     }
+
+
+
+    function user(uid, field) {
+      return get(/databases/$(database)/documents/users/$(uid)).data[field];
+    }
+
+    function myRole() {
+      return user(request.auth.uid, 'role');
+    }
+
+    // 글 쓰기 전에 카테고리가 존재하는지 검사
+    function categoryExists() {
+      return exists(/databases/$(database)/documents/categories/$(request.resource.data.categoryDocumentID));
+    }
+
+
+
+    function category(categoryDocumentID, field) {
+      return get(/databases/$(database)/documents/categories/$(categoryDocumentID)).data[field];
+    }
+
+    function post(postDocumentID, field) {
+      return get(/databases/$(database)/documents/posts/$(postDocumentID)).data[field];
+    }
+
+    // 주의, 해당 글 문서가 존재해야지만, 그 글의 속성 값을 읽을 수 있다.
+    function postCategory(postDocumentID, field) {
+      return category(post(postDocumentID, 'categoryDocumentID'), field);
+    }
+
   }
 }
 
+// ----------------------------------------------------------------------------
+
 // Check if the [fields] does not change.
+// ! Attension - The fields must exist in the document.
 //
-// Use this to block chainging on the properties in [fields].
+// Use this to block changing on the properties in [fields].
 // ```
 // allow update: if notUpdating(['a', 'b', 'c']);
 // ```
 // Fields that are not in the `fields` parameters may change.
 function notUpdating(fields) {
-  return request.resource.data.diff(resource.data).unchangedKeys().hasAll(fields);
+
+  // let d = debug("*** noUpdating( fields ) ***");
+  // let d2 = debug(fields);
+
+  let keys = request.resource.data.diff(resource.data).affectedKeys();
+  // let d3 = debug('*** affected keys ***');
+  // let d4 = debug(keys);
+  // let d5 = debug('*** EO affected keys ***');
+  return keys.hasAny(fields) == false;
 }
 
+
+
+// * Warning : It's check the fields after save.
+// * Warning : !!! It's not checking the incoming data fields !!!
+function required(fields) {
+  // let d = debug('**** required ****');
+  // let e = debug(request.resource.data);
+  return request.resource.data.keys().hasAll( fields );
+}
+
+
+// Check if the incoming uid field match auth.uid
+function willBeMyDoc() {
+   return request.resource.data['uid'] == request.auth.uid;
+}
+
+function isMyDoc() {
+   return resource.data['uid'] == request.auth.uid;
+}
+
+
+// Only updating [fields]
+// - Succeeds if no property changes or only one or all of the [fields] changes.
+// - Fails if other properties rather than the [fields] are changed.
+//
+// - Success if only the properties in the list of [fields] should be changed.
+// - Success if none of the properties are changed.
+//
+// Note, the action will succeed even if
+//  the value of the fields do not changed or does not exists in incoming data.
+//  This means, even if the incoming data is empty, it will succeed.
+//  FIY, `[].hasOnly(['a', 'b'])` is true expression.
+//  See, https://firebase.google.com/docs/reference/rules/rules.List#hasOnly
+// 
+// For instance, when client can only update like and dislike; see the following code;
+// ```
+// rule => onlyUpdating(['like', 'dislike']);
+// code => succeed on `doc.update({})`, `doc.update({like: x})`,
+// code => fails on `doc.update({title: 'x'})` 
+// ```
+// For another instance, the client can update 'viewCounter';
+// ```
+// rule => allow update: if onlyUpdating('viewCounter');
+// code succeeds => doc.update({ viewCounter: FieldValue.increment(1) });
+// code succeeds => doc.update({}); // no update is okay.
+// code fails => doc.update({b: 'Banana'})
+// ```
+function onlyUpdating(fields) {
+  return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+}
 

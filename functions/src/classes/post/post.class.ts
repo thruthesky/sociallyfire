@@ -36,6 +36,9 @@ export class Post {
       read_role: 0,
       comment_role: 0,
       has_photo: files.length > 0,
+      likes: [],
+      dislikes: [],
+      no_of_comments: 0,
       deleted: false,
     };
     return data;

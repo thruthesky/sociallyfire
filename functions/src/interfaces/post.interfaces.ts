@@ -25,8 +25,16 @@ export interface PostDocument {
 
   created_at: admin.firestore.FieldValue;
 
+  // User can set read role. He can set the post to be read by admin only.
   read_role: number;
+
+  // User can set comment under the post or not.
   comment_role: number;
+
+  likes: string[];
+  dislikes: string[];
+
+  no_of_comments: number;
 
   has_photo: boolean;
 
