@@ -5,6 +5,7 @@
 
 - [Fire Engine](#fire-engine)
 - [개요](#개요)
+  - [용어](#용어)
   - [해야 할 작업 목록](#해야-할-작업-목록)
   - [백그라운드 함수만 사용하는 이유](#백그라운드-함수만-사용하는-이유)
 - [Installation](#installation)
@@ -39,7 +40,18 @@
 
 # 개요
 
+- 파이어베이스 기반으로 웹 또는 앱 개발을 할 때, 보다 편리하게 개발 작업을 할 수 있도록 도움을 주는 클라우드 함수 모음이다. 
 - 깃허브 소스 저장소: https://github.com/thruthesky/fire-engine
+
+## 용어
+
+- 일부 클라이언트의 기능적 제한
+  - 파이어베이스를 사용하는 모든 클라이언트 앱/웹 개발 플랫폼이 파이어베이스의 모든 기능을 다 사용 할 수 있는 것은 아니다. 예를 들면, `FlutterFlow`의 경우 파이어베이스의 기능을 매우 제한적으로 사용 할 수 있는데, `Firestore`, `Authentication`, `Storage`, `Cloud Messaging` 등 몇 몇 기능만 사용하는데 그 사용하는 기능 중에서도 일 부분만 사용가능하다. 예를 들면, `Firestore` 의 `Collection Query` 를 사용하지 못하고, `Auth Claims` 을 사용하지 못하며, `Cloud Messaging` 에서 `Topic Subscription` 을 하지 못하는 등 제대로 된 파이어베이스 기능을 사용하지 못하도록 되어져 있다. 
+    - 또한 `FlutterFlow` 에는 정해진 틀이 있어 사용자 정보는 무조건 `Firestore` 의 `users` 컬렉션에 들어가야하는 등 각종 컬렉션, 필드명 등이 미리 정해져 있고 반드시 그 정해진 것을 사용해야 한다.
+    - 그리고 본 프로젝트(`FireEngine`)에서는 모든 클라이언트 개발 플랫폼을 지원하며, `FlutterFlow` 역시 완전히 지원한다.
+    - 따라서 `FireEngine` 의 동작 방식이 이러한 `일부 클라이언트의 기능적 제한`으로 인해 약간은 비효율적인 코드가 있을 수 있다.
+
+
 
 ## 해야 할 작업 목록
 
@@ -56,6 +68,7 @@
   즉, `HTTP Functions` 방식에 비해 클라이언트 개발이 쉬워지면서 반응 속도도 더 빨라 백그라운드 함수 방식을 사용하는 것이다.
 
 - 참고로 어떤 클라이언트 개발 툴(`FlutterFlow`)은 `Callable Functions`를 지원하지 않아, `Callable Functions` 개발을 하지 않는다.
+
 
 
 
