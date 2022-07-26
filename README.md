@@ -17,8 +17,9 @@
   - [Testing indiviual test spec](#testing-indiviual-test-spec)
 - [Lint](#lint)
 - [Deploy](#deploy)
-- [Firestore database and Document Structure](#firestore-database-and-document-structure)
+- [파이어베이스 컬렉션 및 문서 구조](#파이어베이스-컬렉션-및-문서-구조)
   - [User Collection and Document](#user-collection-and-document)
+  - [친구 기능과 DB 구조](#친구-기능과-db-구조)
 - [Storage structure](#storage-structure)
 - [Push message data structure](#push-message-data-structure)
 - [Access Control List - Admin permission security](#access-control-list---admin-permission-security)
@@ -45,7 +46,7 @@
 
 ## 용어
 
-- 일부 클라이언트의 기능적 제한
+- `일부 클라이언트의 기능적 제한` 또는 `클라이언트의 기능 제한`
   - 파이어베이스를 사용하는 모든 클라이언트 앱/웹 개발 플랫폼이 파이어베이스의 모든 기능을 다 사용 할 수 있는 것은 아니다. 예를 들면, `FlutterFlow`의 경우 파이어베이스의 기능을 매우 제한적으로 사용 할 수 있는데, `Firestore`, `Authentication`, `Storage`, `Cloud Messaging` 등 몇 몇 기능만 사용하는데 그 사용하는 기능 중에서도 일 부분만 사용가능하다. 예를 들면, `Firestore` 의 `Collection Query` 를 사용하지 못하고, `Auth Claims` 을 사용하지 못하며, `Cloud Messaging` 에서 `Topic Subscription` 을 하지 못하는 등 제대로 된 파이어베이스 기능을 사용하지 못하도록 되어져 있다. 
     - 또한 `FlutterFlow` 에는 정해진 틀이 있어 사용자 정보는 무조건 `Firestore` 의 `users` 컬렉션에 들어가야하는 등 각종 컬렉션, 필드명 등이 미리 정해져 있고 반드시 그 정해진 것을 사용해야 한다.
     - 그리고 본 프로젝트(`FireEngine`)에서는 모든 클라이언트 개발 플랫폼을 지원하며, `FlutterFlow` 역시 완전히 지원한다.
@@ -144,7 +145,7 @@ Note, that the test scripts that runs with background functions should be end wi
   - It will do `npm run lint:fix` first and if there is no error, it will deploy.
 
 
-# Firestore database and Document Structure
+# 파이어베이스 컬렉션 및 문서 구조
 
 - Some of the collections go "plural" forms while others go "singular" forms.
   - plural forms
@@ -197,6 +198,14 @@ Note, that the test scripts that runs with background functions should be end wi
 ## User Collection and Document
 
 - `uid` is the user's uid.
+
+
+## 친구 기능과 DB 구조
+
+- `클라이언트의 기능적 제한`으로 인해 채팅 사용자는 `/chat_users` 폴더에 기록이 된다. 이 때, 채팅 사용자 필드에 `{friend: true/false}` 를 두어 해당 사용자가 친구인지 아닌지를 판단 할 수 있으며,
+  - `친구 목록`과 `모르는 사람` 목록을 둘 수 있다.
+
+
 
 # Storage structure
 
