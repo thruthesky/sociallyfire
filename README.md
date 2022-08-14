@@ -9,10 +9,10 @@
   - [해야 할 작업 목록](#해야-할-작업-목록)
   - [백그라운드 함수만 사용하는 이유](#백그라운드-함수만-사용하는-이유)
 - [Installation](#installation)
-- [Test](#test)
-  - [Two kinds of testing](#two-kinds-of-testing)
-    - [Test by units](#test-by-units)
-    - [Test with background functions](#test-with-background-functions)
+- [테스트](#테스트)
+  - [두 가지 테스트 방식](#두-가지-테스트-방식)
+    - [클라우드 함수 테스트](#클라우드-함수-테스트)
+    - [코드 유닛 테스트](#코드-유닛-테스트)
   - [Testing the test system.](#testing-the-test-system)
   - [Testing indiviual test spec](#testing-indiviual-test-spec)
 - [Lint](#lint)
@@ -25,7 +25,7 @@
 - [Access Control List - Admin permission security](#access-control-list---admin-permission-security)
 - [Push messaging guidelines](#push-messaging-guidelines)
 - [Test Guidelines](#test-guidelines)
-  - [Test](#test-1)
+  - [Test](#test)
     - [waitUntil](#waituntil)
   - [TODO - seucirty rule check based on user role and category roles](#todo---seucirty-rule-check-based-on-user-role-and-category-roles)
 - [Security rules](#security-rules)
@@ -41,8 +41,11 @@
 
 # 개요
 
-- 파이어베이스 기반으로 웹 또는 앱 개발을 할 때, 보다 편리하게 개발 작업을 할 수 있도록 도움을 주는 클라우드 함수 모음이다. 
+- 파이어베이스 기반으로 웹 또는 앱 개발을 할 때, 보다 편리하게 개발 작업을 할 수 있도록 도움을 주는 클라우드 함수 모음이다.
+- 본 프로젝트는 백엔드의 역할이 매우 강하다. 그리고 클라우드 함수의 특성상 개발 및 유지보수 작업이 만만치 않다. 그래서 100% 완벽한 유닛 테스트를 바탕으로 개발을 해 나가야 한다. 테스트는 원격 파이어베이스 접속없이 모든 에뮬레이터를 통해서 100% 로컬에서 이루어져야 한다.
+  - 100% 완벽한 테스트가 이루어지지 않으면 본 프로젝트는 실패하는 것으로 간주한다.
 - 깃허브 소스 저장소: https://github.com/thruthesky/fire-engine
+
 
 ## 용어
 
@@ -77,50 +80,32 @@
 
 - To test, you need to put your firebase project's admin sdk key into `functions/firebase.admin-key.json`.
 
-# Test
+# 테스트
 
-- The TDD is the most important part of this project, especially when it is written as background functions. The perfect TDD implementation is the ultimate goal to make this project successful.
+- 클라우드 함수를 사용하는데 있어서, 개발이 어렵고 관리가 어려운 점, 특히 버그 또는 에러가 발생하면 클라이언트 개발자에게 큰 부담이 되는 점을 고려해서, 본 프로젝트에서는 버그가 없는 백엔드 개발을 위해서, TDD 를 매우 중요하게 적용하고 있다. 완벽한 TDD 방식의 개발에 실패하면 본 프로젝트는 자동으로 실패하는 것으로 간주한다.
 
-- All the test goes with the real firebase project. This means that, Firebase emulators are not needed and when the test runs, it will directly access the real firebase project. So, there might be some garbage data to be left on the firebase project. It is not recommended to run the tests against the production firebase project. Instead, create a temporary firebase project and do the tests.
+- 표준적인 테스트 코딩 방식으로 TDD 를 해서, 누구라도 쉽게 테스트하고 업데이트를 할 수 있도록 한다.
 
-- The test codes are under `functions/tests` folder.
+- 클라우드 함수 테스트 코드는 `functions/tests` 폴더에 기록된다. 이 폴더에서 테스트를 하기 위해서는 `npm i` 를 하고 `npm run test` 명령을 하면 된다.
+  - 개별적인 테스트를 하기 위해서는 `$ npm run test:user:crud` 와 같이 실행하면 된다.
 
-- To test, enter `functions/tests` folder first and run test like `$ npm run test:user:crud`.
+- 모든 테스트는 로컬 에뮬레이터를 실행하여 테스트한다.
 
+## 두 가지 테스트 방식
 
-## Two kinds of testing
+- 테스트를 빠르게 진행하기 위해서 두 가지 테스트 방식을 가지고 있다.
 
-- There are two different ways of testing.
+### 클라우드 함수 테스트
 
-### Test by units
+- 클라우드 함수에 직접 연결해서 테스트하는 것으로, 클라우드 함수가 먼저 deploy 되어야 한다. 로컬 에뮬레이터에서 테스트를 할 때에는 deploy 과정이 필요없지만, 소스코드가 수정 될 때 마다, 에뮬레이터를 종료하고, 다시 빌드해서, 에뮬레이터를 다시 실행해야 한다. 즉, 좀 번거롭다.
+- 클라우드 함수의 경우 테스트 스크립트 파일 이름이 `*.bg.spect.ts` 로 끝이 난다.
+- 테스트 예: `user.create.bg.spec.ts`(https://github.com/thruthesky/Fire Engine/blob/main/functions/tests/user/user.create.bg.spec.ts)
 
-With this test, when the source code changes, the tests runs and the results are displayed immediately.
-This is very convinient on testing small units but it does not test on the functions itself.
+### 코드 유닛 테스트
 
-- Simply run the tests like `% npm run test:user:create`.
+- 클라우드 함수에 직접 액세스하지 않고, Firestore 에 직접 접속해서 테스트를 한다. 이렇게 하면, 소스 코드 수정 즉시 결과를 알 수 있다. 즉, 클라우드 함수에 직접 테스트하는 것이 아니므로, 매번 다시 빌드하고 에뮬레이터를 재실행하는 번거로움이 없는 것이다.
 
-Note, that the test scripts that runs without background functions should be end with `.spec.ts`.
-
-### Test with background functions
-
-With this test, it will test on the background functions. So, the functions need to be deploy before running the test.
-
-- To run a test,
-  - `% npm run deploy`
-  (or deploy only the function you would like by `% firebase deploy --only functions:...`)
-  - `% npm run test:user:create.bg`
-  - For detailed code explanation, see a sample code of `user.create.bg.spec.ts`(https://github.com/thruthesky/Fire Engine/blob/main/functions/tests/user/user.create.bg.spec.ts).
-
-
-Note, that the test scripts that runs with background functions should be end with `.bg.spec.ts`.
-
-- The TDD is the most important part of this project. The perfect TDD implementation is the ultimate goal to make this project successful.
-
-- The test must be done only in firebase emulator. Do not test on real firebase project.
-
-- The test codes are under `functions/tests` folder.
-
-- To test, enter `functions/tests` folder first.
+- 코드 유닛 테스트의 경우, 스크립트 파일의 확장자는 `*.spect.ts` 로 끝이 난다. 예) `<root>/functions/tests/user/user.create.spec.ts`.
 
 ## Testing the test system.
 
