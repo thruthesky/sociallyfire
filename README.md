@@ -13,6 +13,7 @@
   - [두 가지 테스트 방식](#두-가지-테스트-방식)
     - [클라우드 함수 테스트](#클라우드-함수-테스트)
     - [코드 유닛 테스트](#코드-유닛-테스트)
+  - [에뮬레이터 설치](#에뮬레이터-설치)
   - [Testing the test system.](#testing-the-test-system)
   - [Testing indiviual test spec](#testing-indiviual-test-spec)
 - [Lint](#lint)
@@ -106,6 +107,11 @@
 - 클라우드 함수에 직접 액세스하지 않고, Firestore 에 직접 접속해서 테스트를 한다. 이렇게 하면, 소스 코드 수정 즉시 결과를 알 수 있다. 즉, 클라우드 함수에 직접 테스트하는 것이 아니므로, 매번 다시 빌드하고 에뮬레이터를 재실행하는 번거로움이 없는 것이다.
 
 - 코드 유닛 테스트의 경우, 스크립트 파일의 확장자는 `*.spect.ts` 로 끝이 난다. 예) `<root>/functions/tests/user/user.create.spec.ts`.
+
+## 에뮬레이터 설치
+
+- [공식 홈페이지](https://firebase.google.com/docs/emulator-suite)를 참고해서 설치를 한다. 참고로 테스트를 할 때에는 오직 로컬 에뮬레이터를 통해서만 해야 한다.
+- 
 
 ## Testing the test system.
 
