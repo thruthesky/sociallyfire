@@ -4,6 +4,7 @@
 
 
 - [Fire Engine](#fire-engine)
+- [TODO](#todo)
 - [개요](#개요)
   - [용어](#용어)
   - [해야 할 작업 목록](#해야-할-작업-목록)
@@ -13,8 +14,7 @@
   - [두 가지 테스트 방식](#두-가지-테스트-방식)
     - [클라우드 함수 테스트](#클라우드-함수-테스트)
     - [코드 유닛 테스트](#코드-유닛-테스트)
-  - [에뮬레이터 설치](#에뮬레이터-설치)
-  - [Testing the test system.](#testing-the-test-system)
+  - [테스트가 잘 되는지 테스트하기](#테스트가-잘-되는지-테스트하기)
   - [Testing indiviual test spec](#testing-indiviual-test-spec)
 - [Lint](#lint)
 - [Deploy](#deploy)
@@ -39,12 +39,19 @@
 - [Bugs or Issues](#bugs-or-issues)
 
 
+# TODO
+
+- 사용자 정보를 생성하고, 삭제하는 것은 완료했는데, 수정할 때, meta 에 저장하는 것을 할 것. 주의: 어렵게 코딩하지 말고, 매우 쉽게 할 것.
 
 # 개요
 
 - 파이어베이스 기반으로 웹 또는 앱 개발을 할 때, 보다 편리하게 개발 작업을 할 수 있도록 도움을 주는 클라우드 함수 모음이다.
+
+
 - 본 프로젝트는 백엔드의 역할이 매우 강하다. 그리고 클라우드 함수의 특성상 개발 및 유지보수 작업이 만만치 않다. 그래서 100% 완벽한 유닛 테스트를 바탕으로 개발을 해 나가야 한다. 테스트는 원격 파이어베이스 접속없이 모든 에뮬레이터를 통해서 100% 로컬에서 이루어져야 한다.
   - 100% 완벽한 테스트가 이루어지지 않으면 본 프로젝트는 실패하는 것으로 간주한다.
+
+
 - 깃허브 소스 저장소: https://github.com/thruthesky/fire-engine
 
 
@@ -87,10 +94,11 @@
 
 - 표준적인 테스트 코딩 방식으로 TDD 를 해서, 누구라도 쉽게 테스트하고 업데이트를 할 수 있도록 한다.
 
+- 다만, 모든 테스트는 실제 파이어베이스 프로젝트에 적용한다. 그 이유로는 많은 개발자들이 로컬 (개발자의) 컴퓨터에 에뮬레이터를 설치하고 관리 및 실행하는 것을 어려워하고 있기 때문이다. 하지만, 테스트 작업을 할 때에는 임시 (테스트 전용) 파이어베이스 프로젝트를 생성해서 테스트를 실행 하는 것이 좋다.
+
 - 클라우드 함수 테스트 코드는 `functions/tests` 폴더에 기록된다. 이 폴더에서 테스트를 하기 위해서는 `npm i` 를 하고 `npm run test` 명령을 하면 된다.
   - 개별적인 테스트를 하기 위해서는 `$ npm run test:user:crud` 와 같이 실행하면 된다.
 
-- 모든 테스트는 로컬 에뮬레이터를 실행하여 테스트한다.
 
 ## 두 가지 테스트 방식
 
@@ -98,26 +106,21 @@
 
 ### 클라우드 함수 테스트
 
-- 클라우드 함수에 직접 연결해서 테스트하는 것으로, 클라우드 함수가 먼저 deploy 되어야 한다. 로컬 에뮬레이터에서 테스트를 할 때에는 deploy 과정이 필요없지만, 소스코드가 수정 될 때 마다, 에뮬레이터를 종료하고, 다시 빌드해서, 에뮬레이터를 다시 실행해야 한다. 즉, 좀 번거롭다.
+- 클라우드 함수에 직접 연결해서 테스트하는 것으로, 클라우드 함수가 먼저 deploy 되어야 한다. 로컬 에뮬레이터에서 테스트를 한다면, 소스 코드 수정 후, 에뮬레이터를 종료하고, 다시 빌드해서, 에뮬레이터를 다시 실행해야 한다. 즉, 좀 번거롭지만, 실제 deploy 하는 것 보다는 빠르다.
+  - 하지만, 본 프로젝트에서는 에뮬레이터를 통해서 테스트하는 것 아니라, 임시 (테스트 전용) 파이어베이스 프로젝트에 테스트를 하므로, 실제 deploy 를 해야 한다. 클라우드 함수에 deploy 하는 시간이 좀 오래 걸려서 번거로운 점이 있다. 그래서, deploy 하기 전에 최대한 `코드 유닛 테스트`를 해야 한다.
 - 클라우드 함수의 경우 테스트 스크립트 파일 이름이 `*.bg.spect.ts` 로 끝이 난다.
 - 테스트 예: `user.create.bg.spec.ts`(https://github.com/thruthesky/Fire Engine/blob/main/functions/tests/user/user.create.bg.spec.ts)
 
 ### 코드 유닛 테스트
 
-- 클라우드 함수에 직접 액세스하지 않고, Firestore 에 직접 접속해서 테스트를 한다. 이렇게 하면, 소스 코드 수정 즉시 결과를 알 수 있다. 즉, 클라우드 함수에 직접 테스트하는 것이 아니므로, 매번 다시 빌드하고 에뮬레이터를 재실행하는 번거로움이 없는 것이다.
+- 클라우드 함수를 직접 호출하지 않고, `Firestore` 에 직접 접속해서 테스트를 한다. 이렇게 하면, 함수 부분을 제외한 내부적인 코드를 빠르게 테스트 할 수 있다. Mocha 와 같은 test 를 통해서 소스 코드 수정 즉시 결과를 알 수 있는 것이다. 소스 코드를 수정 할 때 마다 매 번, 빌드하고 클라우드 함수에 deploy 하는 과정을 거치지 않으므로 빠르게 테스트 작업을 할 수 있다. 내부적인 소스 코드의 테스트가 끝나면, 클라우드 함수로 액세스 할 수 있도록 연결하는 것이다.
 
 - 코드 유닛 테스트의 경우, 스크립트 파일의 확장자는 `*.spect.ts` 로 끝이 난다. 예) `<root>/functions/tests/user/user.create.spec.ts`.
 
-## 에뮬레이터 설치
+## 테스트가 잘 되는지 테스트하기
 
-- [공식 홈페이지](https://firebase.google.com/docs/emulator-suite)를 참고해서 설치를 한다. 참고로 테스트를 할 때에는 오직 로컬 에뮬레이터를 통해서만 해야 한다.
-- 
-
-## Testing the test system.
-
-- The `testing system` is the test codes and its enviromental configuration of `Fire Engine`. When you test the `testing system`, it will do the tests to see if everything in the `testing system` is okay.
-
-- To test if the testing is working, run `npm run test:test`.
+- `$ npm run test:test` 명령을 입력하면, 현재 테스트 코드들이 잘 실행될 수 있는지 확인을 한다.
+  - 테스트 패키지가 잘 실행하는지, `Firestore` 에 올바로 접속 할 수 있는지 등을 테스트 한다.
 
 - To test if firebase connection is working, run `npm run test:firebase-connection`.
 

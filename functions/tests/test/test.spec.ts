@@ -4,31 +4,18 @@
 import "mocha";
 import { expect } from "chai";
 import { TestLibrary } from "../test.library.class";
-import { notUpdatable, updatable } from "../../src/library";
+
+
+import { User } from "../../src/classes/user/user.class";
+import { FirebaseAppInitializer } from "../firebase-app-initializer";
+import { UserDocument } from "../../src/interfaces/user.interfaces";
+
+new FirebaseAppInitializer();
 
 describe("Test tests", () => {
-  // the tests container
   it("checking default options", () => {
-    // the single test
     const options = { a: 111, b: "banana" };
-
-    expect(options).to.be.an("object");
-    expect(options.a).to.equal(111);
-    expect(options).not.to.be.empty;
-    // this is a little more complex, but still really clear
     expect(options).to.be.an("object").to.have.property("b").to.equal("banana");
-    // expect(options).is.an("number");
-  });
-
-  it("updatable()", () => {
-    let re = updatable({ a: "apple" }, { a: "banana" });
-    expect(re).equals(true);
-    re = updatable({ a: "apple" }, { b: "banana" });
-    expect(re).equals(true);
-    re = updatable({ c: "cherry" }, { c: "cherry" });
-    expect(re).equals(false);
-    re = notUpdatable({ c: "cherry" }, { c: "cherry" });
-    expect(re).equals(true);
   });
 
   it("waitUntil false", async () => {
@@ -50,5 +37,19 @@ describe("Test tests", () => {
       1
     );
     expect(re).to.be.an("boolean").equals(true);
+  });
+});
+
+
+describe("Firebase connection test", () => {
+  it("Create a user document", async () => {
+    const uid = "uid-" + new Date().getTime();
+    const first_name = 'first name';
+    const ref = await User.create({ uid: uid }, {
+      first_name: first_name,
+    } as UserDocument);
+    expect(ref).to.be.an("object");
+    const created = await User.get(uid);
+    expect(created.first_name).equals(first_name);
   });
 });

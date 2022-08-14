@@ -4,9 +4,9 @@
  * @file user.class.ts
  */
 import * as admin from "firebase-admin";
-import { UserCreate, UserDocument, UserMetaDocument } from "../../interfaces/user.interfaces";
-import { ERROR_USER_DOCUMENT_NOT_FOUND, ERROR_USER_META_DOCUMENT_NOT_FOUND } from "../../defines";
-import { UserRecord } from "firebase-functions/v1/auth";
+import {UserCreate, UserDocument, UserMetaDocument} from "../../interfaces/user.interfaces";
+import {ERROR_USER_DOCUMENT_NOT_FOUND, ERROR_USER_META_DOCUMENT_NOT_FOUND} from "../../defines";
+import {UserRecord} from "firebase-functions/v1/auth";
 
 /**
  * User
@@ -38,14 +38,11 @@ export class User {
    *
    */
   static onCreate(user: UserRecord): Promise<admin.firestore.WriteResult> {
-    return this.update(
-      user.uid,
-      this.completeUserDocument({
-        uid: user.uid,
-        photo_url: user.photoURL ?? "",
-        display_name: user.displayName ?? "",
-      } as UserDocument)
-    );
+    return this.create({
+      uid: user.uid,
+      photoURL: user.photoURL ?? "",
+      displayName: user.displayName ?? "",
+    }, {});
   }
 
   /**
@@ -57,18 +54,15 @@ export class User {
    * @return DocumentReference of the created user doc.
    */
   static async create(
-    user: { uid: string; photoURL?: string; displayName?: string },
-    createData: UserCreate
+      user: { uid: string; photoURL?: string; displayName?: string },
+      createData: UserCreate
   ): Promise<admin.firestore.WriteResult> {
-    return this.update(
-      user.uid,
-      this.completeUserDocument({
-        ...createData,
-        uid: user.uid,
-        photo_url: user.photoURL,
-        display_name: user.displayName,
-      } as UserDocument)
-    );
+    return await this.doc(user.uid).set({
+      uid: user.uid,
+      photo_url: user.photoURL,
+      display_name: user.displayName,
+      ...createData,
+    }, {merge: true});
   }
 
   /**
@@ -81,10 +75,10 @@ export class User {
    *
    */
   static async onUpdate(
-    params: { uid: string },
-    data: UserDocument
+      params: { uid: string },
+      data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
-    return this.updateMeta(params.uid, this.completeUserDocument(data));
+    return this.update(params.uid, data);
   }
 
   /**
@@ -97,11 +91,20 @@ export class User {
    */
   // eslint-disable-next-line
   static async update(uid: string, data: UserDocument): Promise<admin.firestore.WriteResult> {
-    data = this.completeUserDocument(data);
-    await this.doc(uid).set(data, { merge: true });
+    await this.doc(uid).set(data, {merge: true});
     return this.updateMeta(uid, data);
   }
 
+  /**
+   * 사용자 메타 정보를 저장한다.
+   * 
+   * 특히, 사용자의 생년월일, 성별, 사진 등의 정보가 있는지 없는지를 표시하는 필드를 추가하여
+   * /users-meta 컬렉션에 저장한다. 이 후, /users 을 검색 할 필요 없이, /users-meta 를
+   * 검색하면 된다.
+   * 
+   * @param uid 사용자 uid
+   * @param data 업데이트 할 메타 데이터
+   */
   static async updateMeta(uid: string, data: UserDocument) {
     // eslint-disable-next-line
     const doc: UserMetaDocument = {
@@ -120,7 +123,11 @@ export class User {
     return this.metaDoc(uid).set(doc);
   }
 
-  static async delete(uid: string) {
+  static onDelete(user: UserRecord): Promise<admin.firestore.WriteResult> {
+    return this.delete(user.uid);
+  }
+
+  static async delete(uid: string): Promise<admin.firestore.WriteResult> {
     return this.doc(uid).delete();
   }
 
@@ -156,6 +163,11 @@ export class User {
     return snapshot.exists;
   }
 
+  static async notExists(uid: string): Promise<boolean> {
+    const re = this.exists(uid);
+    return !re;
+  }
+
   /**
    * 사용자 meta 문서가 존재하는지 확인.
    *
@@ -168,33 +180,5 @@ export class User {
   static async metaExists(uid: string): Promise<boolean> {
     const snapshot = await this.metaDoc(uid).get();
     return snapshot.exists;
-  }
-
-  /**
-   * 사용자 문서에서 빠진 필드가 있으면 기본 값으로 채워 리턴
-   *
-   * 사용 예, 회원 가입을 처음 할 때, 사용자 계정을 처음 생성할 때, 모든 필드에 기본 값을 채우기 위해서 사용.
-   *
-   * @param data user document data.
-   *
-   */
-  static completeUserDocument(data: UserDocument): UserDocument {
-    // / These are the default values and set only time on user account creation.
-    data.birthday ??= 0;
-    data.display_name ??= "";
-    data.first_name ??= "";
-    data.gender ??= "";
-    data.last_name ??= "";
-    data.middle_name ??= "";
-    data.photo_url ??= "";
-    data.role ??= 0;
-
-    // / If it is nullish, it means the user is creating an account.
-    data.registered_at ??= admin.firestore.FieldValue.serverTimestamp();
-
-    // eslint-disable-next-line
-    delete (data as any).id;
-
-    return data;
   }
 }

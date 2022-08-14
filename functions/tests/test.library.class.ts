@@ -28,7 +28,7 @@ export class TestLibrary {
    *    const re = await TestLibrary.waitUntil(() => User.exists(user.uid), 200, 30);
    *    expect(re).equals(true);
    */
-  static async waitUntil(callback: () => Promise<boolean>, time = 500, retry = 15) {
+  static async waitUntil(callback: () => Promise<boolean>, time = 200, retry = 15) {
     for (let i = 0; i < retry; i++) {
       await this.delay(time);
       const re = await callback();

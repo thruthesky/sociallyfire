@@ -11,6 +11,14 @@ export const onUserCreate = functions
       return User.onCreate(user);
     });
 
+export const onUserDelete = functions
+    .region("asia-northeast3")
+    .auth.user()
+    .onDelete((user: UserRecord) => {
+      console.log("user; ", user);
+      return User.onDelete(user);
+    });
+
 export const onUserUpdate = functions
     .region("asia-northeast3")
     .firestore.document("users/{uid}")

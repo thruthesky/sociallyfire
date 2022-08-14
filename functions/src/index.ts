@@ -12,11 +12,11 @@ export * from "./cloud-functions/post.functions";
 // export * from "./cloud-functions/messaging.functions";
 
 
-export const makeUppercase = functions.firestore.document('/tmp/{documentId}')
-.onCreate((snap, context) => {
-  const original = snap.data().original;
-  console.log('Uppercasing', context.params.documentId, original);
-  const uppercase = original.toUpperCase();
-  return snap.ref.set({uppercase}, {merge: true});
-});
+export const makeUppercase = functions.firestore.document("/tmp/{documentId}")
+    .onCreate((snap, context) => {
+      const original = snap.data().original;
+      console.log("Uppercasing", context.params.documentId, original);
+      const uppercase = original.toUpperCase();
+      return snap.ref.set({uppercase}, {merge: true});
+    });
 

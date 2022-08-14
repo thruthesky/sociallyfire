@@ -21,3 +21,4 @@ describe("Firebase connection test", () => {
     expect(created.first_name).equals(first_name);
   });
 });
+
