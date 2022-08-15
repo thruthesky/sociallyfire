@@ -49,6 +49,7 @@
 - 글 테스트
 - 푸시 토큰 저장
 - 글 작성, 코멘트 작성시 푸시 알림 테스트
+- `apps/` 폴더에 `firelfutter` 와 `firenuxt` 가 있다. fireflutter 는 플러터 용 앱 이며, `firenuxt`는 nuxt 용 웹이다. nuxt 용은 SEO 를 할 때에는 nuxt server api 를 쓰고, 앱 로드 후에는 클라이언트에서 직접 파이어스토어로 접속한다.
 
 # 개요
 
