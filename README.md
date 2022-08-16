@@ -9,6 +9,7 @@
   - [용어](#용어)
   - [해야 할 작업 목록](#해야-할-작업-목록)
   - [백그라운드 함수만 사용하는 이유](#백그라운드-함수만-사용하는-이유)
+  - [FlutterFlow 지원](#flutterflow-지원)
 - [Installation](#installation)
 - [테스트](#테스트)
   - [두 가지 테스트 방식](#두-가지-테스트-방식)
@@ -90,6 +91,11 @@
 - 참고로 어떤 클라이언트 개발 툴(`FlutterFlow`)은 `Callable Functions`를 지원하지 않아, `Callable Functions` 개발을 하지 않는다.
 
 
+## FlutterFlow 지원
+
+- FlutterFlow 는 플러터와 파이어베이스를 기반으로 동작하는 매우 제한적인 노코드 개발 플랫폼이다. Android 와 iOS 앱을 개발 할 수 있으나,
+  - Firebase Database 를 지원하지 않고 Firestore 만 지원하며, 로직이 한정되어져 있어 Firestore 뿐만아니라 Storage 등의 구조(또는 활용범위)가 매우 제한적이며 클라우드 함수 중 Callable 함수는 호출 하지 못하는 등 제대로 된 파이어베이스 활용이 어려울 정도이다.
+  - 그럼에도 FlutterFlow 를 지원하는 것은, 본 프로젝트의 모든 기능을 매우 제한적인 기능을 가진 FlutterFlow 를 완벽히 지원하므로서 다른 개발 플랫폼도 충분히 본 프로젝트를 활용할 수 있다는 것을 보여주고자 한다.
 
 
 # Installation
