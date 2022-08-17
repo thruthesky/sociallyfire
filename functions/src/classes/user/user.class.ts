@@ -4,9 +4,9 @@
  * @file user.class.ts
  */
 import * as admin from "firebase-admin";
-import {UserCreate, UserDocument, UserMetaDocument} from "../../interfaces/user.interfaces";
-import {ERROR_USER_DOCUMENT_NOT_FOUND, ERROR_USER_META_DOCUMENT_NOT_FOUND} from "../../defines";
-import {UserRecord} from "firebase-functions/v1/auth";
+import { UserCreate, UserDocument, UserMetaDocument } from "../../interfaces/user.interfaces";
+import { ERROR_USER_DOCUMENT_NOT_FOUND, ERROR_USER_META_DOCUMENT_NOT_FOUND } from "../../defines";
+import { UserRecord } from "firebase-functions/v1/auth";
 
 /**
  * User
@@ -30,19 +30,24 @@ export class User {
   }
 
   /**
+   * FirebaseAuth 사용자 생성 트리거
+   *
    * This is invoked on [onCreate] of firestore event trigger and update the user document with necessary properties.
    *
-   *
+   * 사용자 문서와 사용자 메타 문서를 생성한다.
    *
    * @param {UserRecord} user uid is the uid of the user
    *
    */
-  static onCreate(user: UserRecord): Promise<admin.firestore.WriteResult> {
-    return this.create({
-      uid: user.uid,
-      photoURL: user.photoURL ?? "",
-      displayName: user.displayName ?? "",
-    }, {});
+  static onCreate(user: UserRecord): Promise<admin.firestore.WriteResult[]> {
+    return this.create(
+      {
+        uid: user.uid,
+        photoURL: user.photoURL ?? "",
+        displayName: user.displayName ?? "",
+      },
+      {}
+    );
   }
 
   /**
@@ -54,15 +59,19 @@ export class User {
    * @return DocumentReference of the created user doc.
    */
   static async create(
-      user: { uid: string; photoURL?: string; displayName?: string },
-      createData: UserCreate
-  ): Promise<admin.firestore.WriteResult> {
-    return await this.doc(user.uid).set({
+    user: { uid: string; photoURL?: string; displayName?: string },
+    createData: UserCreate
+  ): Promise<admin.firestore.WriteResult[]> {
+    const data = {
       uid: user.uid,
       photo_url: user.photoURL,
       display_name: user.displayName,
       ...createData,
-    }, {merge: true});
+    };
+    return Promise.all([
+      this.doc(user.uid).set(data, { merge: true }),
+      this.updateMeta(user.uid, data as UserDocument),
+    ]);
   }
 
   /**
@@ -75,8 +84,8 @@ export class User {
    *
    */
   static async onUpdate(
-      params: { uid: string },
-      data: UserDocument
+    params: { uid: string },
+    data: UserDocument
   ): Promise<admin.firestore.WriteResult> {
     return this.update(params.uid, data);
   }
@@ -91,17 +100,17 @@ export class User {
    */
   // eslint-disable-next-line
   static async update(uid: string, data: UserDocument): Promise<admin.firestore.WriteResult> {
-    await this.doc(uid).set(data, {merge: true});
+    await this.doc(uid).set(data, { merge: true });
     return this.updateMeta(uid, data);
   }
 
   /**
    * 사용자 메타 정보를 저장한다.
-   * 
+   *
    * 특히, 사용자의 생년월일, 성별, 사진 등의 정보가 있는지 없는지를 표시하는 필드를 추가하여
    * /users-meta 컬렉션에 저장한다. 이 후, /users 을 검색 할 필요 없이, /users-meta 를
    * 검색하면 된다.
-   * 
+   *
    * @param uid 사용자 uid
    * @param data 업데이트 할 메타 데이터
    */
@@ -164,8 +173,7 @@ export class User {
   }
 
   static async notExists(uid: string): Promise<boolean> {
-    const re = this.exists(uid);
-    return !re;
+    return !(await this.exists(uid));
   }
 
   /**
@@ -180,5 +188,8 @@ export class User {
   static async metaExists(uid: string): Promise<boolean> {
     const snapshot = await this.metaDoc(uid).get();
     return snapshot.exists;
+  }
+  static async metaNotExists(uid: string): Promise<boolean> {
+    return !(await this.metaExists(uid));
   }
 }
