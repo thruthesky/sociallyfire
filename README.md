@@ -22,8 +22,8 @@
 - [Lint](#lint)
 - [Deploy](#deploy)
 - [파이어베이스 컬렉션 및 문서 구조](#파이어베이스-컬렉션-및-문서-구조)
-  - [User Collection and Document](#user-collection-and-document)
-  - [친구 기능과 DB 구조](#친구-기능과-db-구조)
+  - [사용자 문서](#사용자-문서)
+  - [친구 기능](#친구-기능)
 - [Storage structure](#storage-structure)
 - [Push message data structure](#push-message-data-structure)
 - [Access Control List - Admin permission security](#access-control-list---admin-permission-security)
@@ -43,6 +43,10 @@
 
 
 # TODO
+
+- 플러터플로는 지원을 하지 않는다. at 2022. 08. 17.
+  - 문제점: 플러터플로의 기능이 너무 제한적이다. 그래서 완벽한 앱을 개발하는데 너무 많은 노력이 들어간다.
+  - 개전점: 플러터플로를 무시하고, `클라이언트의 기능 제한`을 고려하지 않고, 즉, 클라이언트의 기능적인 면을 무시하고, `FireEngine`이 가질 수 있는 최대한의 기능과 성능으로 백엔드를 구성한다.
 
 - 사용자 정보를 생성하고, 삭제하는 것은 완료했는데,
   - 수정할 때, meta 에 저장하는 것을 할 것. 주의: 어렵게 코딩하지 말고, 매우 쉽게 할 것.
@@ -71,7 +75,7 @@
 
 - `일부 클라이언트의 기능적 제한` 또는 `클라이언트의 기능 제한`
   - 파이어베이스를 사용하는 모든 클라이언트 앱/웹 개발 플랫폼이 파이어베이스의 모든 기능을 다 사용 할 수 있는 것은 아니다. 예를 들면, `FlutterFlow`의 경우 파이어베이스의 기능을 매우 제한적으로 사용 할 수 있는데, `Firestore`, `Authentication`, `Storage`, `Cloud Messaging` 등 몇 몇 기능만 사용하는데 그 사용하는 기능 중에서도 일 부분만 사용가능하다. 예를 들면, `Firestore` 의 `Collection Query` 를 사용하지 못하고, `Auth Claims` 을 사용하지 못하며, `Cloud Messaging` 에서 `Topic Subscription` 을 하지 못하는 등 제대로 된 파이어베이스 기능을 사용하지 못하도록 되어져 있다. 
-    - 또한 `FlutterFlow` 에는 정해진 틀이 있어 사용자 정보는 무조건 `Firestore` 의 `users` 컬렉션에 들어가야하는 등 각종 컬렉션, 필드명 등이 미리 정해져 있고 반드시 그 정해진 것을 사용해야 한다.
+    - 또한 `FlutterFlow` 에는 정해진 틀이 있어 사용자 정보는 무조건 `Firestore` 의 `users` 컬렉션에 들어가야하고, 채팅(방) 사용자 목록은 반드시 `/chat_users` 컬렉션에 들어가야 한다. 이 처럼, 각종 컬렉션, 필드명 등이 미리 정해져 있고 반드시 그 정해진 것을 사용해야 한다. 
     - 그리고 본 프로젝트(`FireEngine`)에서는 모든 클라이언트 개발 플랫폼을 지원하며, `FlutterFlow` 역시 완전히 지원한다.
     - 따라서 `FireEngine` 의 동작 방식이 이러한 `일부 클라이언트의 기능적 제한`으로 인해 약간은 비효율적인 코드가 있을 수 있다.
 
@@ -231,12 +235,15 @@
     - 이것은 `posts-meta` 와 `comments-meta` 도 동일한다.
 
 
-## User Collection and Document
+## 사용자 문서
 
+- `/users` 컬렉션 아래의 문서는 모든 사용자에게 공개된다. 따라서 전화번호, 이메일과 같은 정보가 들어가서는 안된다. 단, `FlutterFlow` 는 예외.
+- `/users/<uid>` 에 기록을 한다.
+- `/users-meta/<uid>` 에 검색을 한다.
 - `uid` is the user's uid.
 
 
-## 친구 기능과 DB 구조
+## 친구 기능
 
 - `클라이언트의 기능적 제한`으로 인해 채팅 사용자는 `/chat_users` 폴더에 기록이 된다. 이 때, 채팅 사용자 필드에 `{friend: true/false}` 를 두어 해당 사용자가 친구인지 아닌지를 판단 할 수 있으며,
   - `친구 목록`과 `모르는 사람` 목록을 둘 수 있다.
